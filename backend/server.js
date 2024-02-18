@@ -1,16 +1,18 @@
-  const express = require('express')
- const mysql = require('mysql')
- const cors = require('cors')
+const express = require('express')
+const mysql = require('mysql')
+const cors = require('cors')
 
- const app = express()
+require('dotenv').config()
+
+const app = express()
 app.use(cors());
 app.use(express.json())
 
 const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'Davron2009', 
-    database: 'signup'
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD, 
+    database: process.env.DB_DBNAME
 })
 
 const getTable = (req, res) => {
@@ -110,39 +112,36 @@ app.post('/user', (req, res) => {
     }) 
 })
 
-app.post('/changeStatus', (req, res) => {
+app.post('/change', (req, res) => {
     let error = false;
-    for (id of req.body.ids) {
-        const updateStateQuery = 'UPDATE users SET status = ? WHERE id = ?'
-        db.query(updateStateQuery, [req.body.status, id], (err, data) => {
-            if (err) {
-                console.error('Database error:', err);
-                error = true;
-                return res.json('Error');
+    const getDataQuery = 'SELECT * FROM users where id = ?'; 
+    db.query(getDataQuery, [req.body.userid], (err, data) => {
+        if (data.length && data[0].status === 'Active') {
+            const deleteQuery = 'DELETE FROM users WHERE id = ?'
+            const updateStateQuery = 'UPDATE users SET status = ? WHERE id = ?'
+            console.log((req.body.status === 'Delete' ? deleteQuery : updateStateQuery))
+            const changeQuery = (req.body.status === 'Delete' ? deleteQuery : updateStateQuery)
+            for (id of req.body.ids) {
+                const queryData = (req.body.status === 'Delete' ? [id] : [req.body.status, id])
+                db.query(changeQuery, queryData, (err, data) => {
+                    if (err) {
+                        console.error('Database error:', err);
+                        error = true;
+                        return res.json('Error');
+                    }
+                })
+                if (error) {break;} 
             }
-        })
-        if (error) {break;} 
-    }
-    if(!error) {getTable(req, res);} 
+            if(!error) {getTable(req, res);} 
+        }
+        else {
+            return res.status(404).send({message: 'user error'})
+        }
+    })
+    
 })
 
-app.post('/delete', (req, res) => {
-    let error = false;
-    for (id of req.body.ids) {
-        const deleteQuery = 'DELETE FROM users WHERE id = ?';
-        db.query(deleteQuery, [id], (err, data) => {
-            if (err) {
-                console.error('Database error:', err);
-                error = true;
-                return res.json('Error');
-            }
-            console.log('Delete user with id', id)
-        })
-        if (error) {break;} 
-    }
-    if(!error) {getTable(req, res);} 
-})
-
-app.listen(8081, () => {
+const PORT = process.env.PORT || 8081
+app.listen(PORT, () => {
     console.log('listening')
 })

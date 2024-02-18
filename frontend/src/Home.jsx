@@ -44,41 +44,23 @@ const Home = () => {
 
   const handleChangeStatus = (status) => {
     changeUserState(user)
-    if (user.status === 'Active') {
-      let data = {
-        ids: [],
-        status
-      }
-      for (let id in checkedItems) {checkedItems[id] && data.ids.push(id)}
-      console.log(data)
-      if (data.ids.length) {
-        axios.post('http://localhost:8081/changeStatus', data)
-        .then(res => {
-          console.log(res)
-          setData(res.data)
-        })
-        .catch(err => console.log(err))
-      }    
+    let data = {
+      ids: [],
+      status,
+      userid: user.id
     }
+    for (let id in checkedItems) {checkedItems[id] && data.ids.push(id)}
+    console.log(data)
+    if (data.ids.length) {
+      axios.post('http://localhost:8081/change', data)
+      .then(res => {
+        console.log(res)
+        setData(res.data)
+      })
+      .catch(err => console.log(err))
+    }    
   }
 
-  const handleDelete = () => {
-    changeUserState(user)
-    if (user.status === 'Active') {
-      let data = {
-        ids: []
-      }
-      for (let id in checkedItems) {checkedItems[id] && data.ids.push(id)}
-      if (data.ids.length) {
-        axios.post('http://localhost:8081/delete', data)
-        .then(res => {
-          console.log(res.data)
-          setData(res.data)
-        })
-        .catch(err => console.log(err))
-      }
-    }
-  }
   return (
     <div className="d-flex flex-column bg-dark align-items-center min-vh-100">
       <nav className="navbar bg-body-tertiary fixed-top">
@@ -92,7 +74,7 @@ const Home = () => {
       <div className="d-flex justify-content-start w-75 gap-2" style={{ marginTop: '150px'}}>
                     <button type='button' className='btn btn-light' onClick={() => handleChangeStatus('Blocked')}><img src={Lock} width={20} height={20}/>  Block</button>
                     <button type='button' className='btn btn-light' onClick={() => handleChangeStatus('Active')}><img src={Unlock} width={20} height={20}/></button>
-                    <button type='button' className='btn btn-danger' onClick={handleDelete}><img src={Trash} width={20} height={20}/>
+                    <button type='button' className='btn btn-danger' onClick={() => handleChangeStatus('Delete')}><img src={Trash} width={20} height={20}/>
 
                     </button>
                 </div>
