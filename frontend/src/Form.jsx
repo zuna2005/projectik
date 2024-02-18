@@ -5,10 +5,9 @@ import ValidateLogin from './LoginValidation'
 import FormField from './FormField'
 import moment from 'moment'
 import { useAppContext } from './AppContext'
-import UpdateUser from './UpdateUser'
 
 const Form = ({heading}) => {
-    const {user, changeUserState} = useAppContext();
+    const {user, changeUserState, setUser} = useAppContext();
     let messageText = ''
     if (user.status === 'Blocked') {
         messageText = "You're blocked and can no longer log into the system"

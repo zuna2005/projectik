@@ -14,7 +14,7 @@ function App() {
     return newUser
 }
   return (
-    <AppContext.Provider value={{ user, changeUserState }}>
+    <AppContext.Provider value={{ user, changeUserState, setUser }}>
       <BrowserRouter>
         <Routes>
           <Route path='/' element={user.status === 'Active' ? <Navigate to='/home' /> : <Form heading='Login' />}></Route>

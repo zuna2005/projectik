@@ -7,7 +7,7 @@ import Unlock from './assets/lock-open-solid.svg'
 import { useAppContext } from './AppContext'
 
 const Home = () => {
-  const {user, changeUserState} = useAppContext();
+  const {user, changeUserState, setUser} = useAppContext();
   const [data, setData] = useState([]);
   useEffect(() =>{
     axios.get('http://localhost:8081/table')
@@ -17,15 +17,25 @@ const Home = () => {
     })
     .catch(err => console.log(err))
   }, [])
-  
-  const [checkedItems, setCheckedItems] = useState({});
+
+  const [checkedItems, setCheckedItems] = useState({})
+  const [allChecked, setAllChecked] = useState(false)
 
   const handleCheckboxChange = (event) => {
     setCheckedItems(prev => ({...prev, [event.target.name]: event.target.checked}));
+    console.log(checkedItems)
+    let updCheckedItems = {...checkedItems, [event.target.name]: event.target.checked}
+    if (Object.values(updCheckedItems).length === data.length) {
+      setAllChecked(Object.values(updCheckedItems).every(checked => checked === true))
+    }
+    else {setAllChecked(false)}
+    console.log('updcheckeditems', Object.values(updCheckedItems))
+    
   }
 
-  const handleChecboxChangeAll = (event) => {
+  const handleCheckboxChangeAll = (event) => {
     let result = {}
+    setAllChecked(event.target.checked)
     for (let i in data) {
       result[data[i].id] = event.target.checked
     }
@@ -76,7 +86,7 @@ const Home = () => {
           <span className="navbar-item">
             {`Hello, ${user.name}!`}
           </span>
-          <span className='text-primary text-decoration-underline' onClick={() => changeUserState({status: ''})}>Logout</span>
+          <span className='text-primary text-decoration-underline' onClick={() => setUser({status: ''})}>Logout</span>
         </div>
       </nav>
       <div className="d-flex justify-content-start w-75 gap-2" style={{ marginTop: '150px'}}>
@@ -90,7 +100,7 @@ const Home = () => {
         <table className='table table-bordered table-striped table-hover'>
           <thead>
             <tr>
-                <th><input type="checkbox" onChange={handleChecboxChangeAll} /></th>
+                <th><input type="checkbox" checked={allChecked} onChange={handleCheckboxChangeAll} /></th>
                 <th>Name</th>
                 <th>Email</th>
                 <th>Last login</th>
@@ -105,7 +115,7 @@ const Home = () => {
                         <input 
                           type="checkbox"
                           name={val.id}
-                          checked={checkedItems[val.id] || false}
+                          checked={checkedItems[val.id]}
                           onChange={handleCheckboxChange}
                         />
                         </td>
