@@ -8,7 +8,6 @@ import { useAppContext } from './AppContext'
 
 const Form = ({heading}) => {
     const {user, changeUserState, setUser} = useAppContext();
-    // console.log(import.meta.env.VITE_REACT_APP_BACKEND_URL);
     let messageText = ''
     if (user.status === 'Blocked') {
         messageText = "You're blocked and can no longer log into the system"
