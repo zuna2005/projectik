@@ -10,7 +10,7 @@ const Home = () => {
   const {user, changeUserState, setUser} = useAppContext();
   const [data, setData] = useState([]);
   useEffect(() =>{
-    axios.get('http://localhost:8081/table')
+    axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/table`)
     .then(res => {
         console.log(res)
         setData(res.data)
@@ -52,7 +52,7 @@ const Home = () => {
     for (let id in checkedItems) {checkedItems[id] && data.ids.push(id)}
     console.log(data)
     if (data.ids.length) {
-      axios.post('http://localhost:8081/change', data)
+      axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/change`, data)
       .then(res => {
         console.log(res)
         setData(res.data)
