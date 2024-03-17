@@ -1,5 +1,4 @@
 const crypto = require('crypto')
-const result = require('dotenv').config()
 
 function getHmac(password) {
     let myHmac = crypto.createHmac("sha256", process.env.HMAC_KEY)

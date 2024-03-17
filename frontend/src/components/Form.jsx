@@ -4,9 +4,7 @@ import {useDispatch, useSelector} from 'react-redux'
 import axios from 'axios'
 import ValidateLogin from '../LoginValidation'
 import FormField from './FormField'
-import { useAppContext } from '../AppContext'
-import {setUser} from "../features/login/loginSlice"
-import changeUserState from '../UpdateUser'
+import {setUser} from "../features/loginSlice"
 
 const Form = ({heading}) => {
     // const {user, changeUserState, setUser} = useAppContext();
@@ -57,9 +55,8 @@ const Form = ({heading}) => {
             axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/users/login`, values)
             .then(res => {
                 console.log(res.data)
-                if (res.data === 'Success') {
-                    //changeUserState(values)
-                    dispatch(setUser(changeUserState(values)))
+                if (res.status == 200) {
+                    dispatch(setUser({...res.data}))
                     navigate('/')
                     if (user.status === 'Blocked') {
                         setMessage(prev => ({...prev, text:"You're blocked and can no longer log into the system"}))

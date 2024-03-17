@@ -1,18 +1,21 @@
 import React from 'react'
+import { NavLink } from 'react-router-dom'
 
 const Tabs = () => {
+    // const handleCLick = (event) => {
+    //     setCurrentPage(event.target.name)
+    // }
+    const names = ['Latest Items', 'Largest Collections', 'Tag Cloud']
+    const links = ['/', 'largest-collections', 'tag-cloud']
   return (
     <div>
         <ul className="nav nav-tabs nav-justified">
-            <li className="nav-item">
-                <a className="nav-link active" aria-current="page" href="#">Latest Items</a>
-            </li>
-            <li className="nav-item">
-                <a className="nav-link" href="#">Largest Collections</a>
-            </li>
-            <li className="nav-item">
-                <a className="nav-link" href="#">Tag Cloud</a>
-            </li>
+            {names.map((val, id) => {
+                return (
+                 <li className="nav-item">
+                    <NavLink to={links[id]} className={"nav-link"} name={val} >{val}</NavLink>
+                </li>)
+            })}
         </ul>
     </div>
   )
