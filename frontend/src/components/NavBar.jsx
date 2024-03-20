@@ -13,23 +13,15 @@ const NavBar = () => {
     const user = useSelector(state => state.login.currentUser)
     console.log("user:", user)
 
-    const handleMyPage = () => {
-        if (user.status != '') {
-            //setCurrentPage('My Page')
-            console.log("my page");
-        }
-    }
-
     const handleLogout = () => {
         dispatch(setUser({status: ''}))
-        setCurrentPage('Latest Items')
     }
   return (
     <div>
         <nav className="navbar navbar-expand-lg bg-body-tertiary">
             <div className="container-fluid d-flex justify-content-evenly">
                 {user.status != '' &&
-                <NavLink to='my-page' type='button' className='btn btn-outline-dark' onClick={handleMyPage}>
+                <NavLink to='my-page' type='button' className='btn btn-outline-dark'>
                     <img src={Person} width={25} height={25}/> My Page
                 </NavLink>}
                 <form className="d-flex">

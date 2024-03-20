@@ -32,7 +32,6 @@ const Form = ({heading}) => {
     }
     const handleSubmit = (event) => {
         event.preventDefault()
-        console.log('you pressed the green button')
         let errorsTemp = ValidateLogin(values)
         setErrors(errorsTemp)
         if (heading === 'Sign up' && Object.values(errorsTemp).every(value => value === '')) {
@@ -52,7 +51,6 @@ const Form = ({heading}) => {
         else if (heading === 'Login' && Object.values(errorsTemp).slice(1).every(value => value === '')) {
             axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/users/login`, values)
             .then(res => {
-                console.log(res.data)
                 dispatch(setUser({...res.data}))
                 document.getElementById('loginModal').classList.remove('show')
                 document.getElementsByClassName('modal-backdrop')[0].remove();
@@ -74,11 +72,6 @@ const Form = ({heading}) => {
             setMessage(prev => ({...prev, text:''}))
         }
     }
-    const handleClear = () => {
-        setValues({ name: '', email: '', password: '' })
-        setErrors({})
-        setMessage({})
-    }
   return (
     <div className="modal fade" id={heading === 'Login' ? 'loginModal' : 'signupModal'} tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div className="modal-dialog modal-dialog-centered">
@@ -91,9 +84,9 @@ const Form = ({heading}) => {
             {message.text && <div className={`alert alert-${message.type}`} role="alert">{message.text}</div>}
                 <form>
                     {heading === 'Sign up' && 
-                    <FormField name='name' onChange={handleInput} errors={errors} />}
-                    <FormField name='email' onChange={handleInput} errors={errors} />
-                    <FormField name='password' onChange={handleInput} errors={errors} />
+                    <FormField name='name' onChange={handleInput} errors={errors} heading={heading}/>}
+                    <FormField name='email' onChange={handleInput} errors={errors} heading={heading}/>
+                    <FormField name='password' onChange={handleInput} errors={errors} heading={heading}/>
                 </form>
                 <div className="d-flex justify-content-between">
                         <button type='submit' className='btn btn-success' onClick={handleSubmit}>{heading}</button>

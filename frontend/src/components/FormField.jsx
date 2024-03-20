@@ -1,11 +1,11 @@
 import React from 'react'
 
-const FormField = ({name, onChange, errors}) => {
+const FormField = ({name, onChange, errors, heading}) => {
   return (
     <div className='mb-3'>
-        <label htmlFor={name} className="form-label">{name.charAt(0).toUpperCase() + name.slice(1)}</label>
+        <label htmlFor={name + heading} className="form-label">{name.charAt(0).toUpperCase() + name.slice(1)}</label>
         <input 
-          id={name}
+          id={name + heading}
           type={name==='name' ? 'text': name}
           className="form-control" name={name}
           onChange={onChange}

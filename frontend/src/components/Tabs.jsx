@@ -12,7 +12,7 @@ const Tabs = () => {
         <ul className="nav nav-tabs nav-justified">
             {names.map((val, id) => {
                 return (
-                 <li className="nav-item">
+                 <li className="nav-item" key={id}>
                     <NavLink to={links[id]} className={"nav-link"} name={val} >{val}</NavLink>
                 </li>)
             })}
