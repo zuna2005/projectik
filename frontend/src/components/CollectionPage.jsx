@@ -12,7 +12,7 @@ const CollectionPage = () => {
   const navigate = useNavigate()
 
   const [collection, setCollection] = useState({})
-  const [data, setData] = useState([])
+  const [items, setItems] = useState([])
   useEffect(() =>{
     axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/collections/getcollection`, {coll_id})
     .then(res => {
@@ -20,6 +20,43 @@ const CollectionPage = () => {
         console.log(res.data[0])
     })
     .catch(err => console.log(err))
+    // axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/collections/getItems`, {coll_id})
+    // .then(res => {
+    //     setItems(res.data)
+    //     console.log(res.data)
+    // })
+    // .catch(err => console.log(err))
+    const getTags = async (ids) => {
+      try {
+        const response = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/tags/byId`, { ids })
+        const tags = response.data.map(val => '#' + val.name).join(', ')
+        return tags
+      } catch (error) {
+        console.error('Error fetching tags:', error)
+        return []
+      }
+    }
+
+    const fetchItemsAndTags = async () => {
+      try {
+        const itemsResponse = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/collections/getItems`, { coll_id });
+        const itemsData = itemsResponse.data
+
+        const tagsPromises = itemsData.map(item => getTags(item.tags));
+        const tagsData = await Promise.all(tagsPromises);
+  
+        const itemsWithTags = itemsData.map((item, index) => ({
+          ...item,
+          tags: tagsData[index]
+        }));
+  
+        setItems(itemsWithTags);
+      } catch (error) {
+        console.error('Error fetching items:', error);
+      }
+    };
+  
+    fetchItemsAndTags();
   }, [])
 
   const [checkedItems, setCheckedItems] = useState({})
@@ -121,8 +158,9 @@ const CollectionPage = () => {
             </tr>
           </thead>
           <tbody>
-            {data.map((val) => {
+            {items.map((val) => {
               return (<tr key={val.id} onClick={(e) => handleItemPage(e, val.id)}>
+                {user.id === collection.user_id &&
                 <td>
                   <input 
                     type="checkbox"
@@ -130,10 +168,10 @@ const CollectionPage = () => {
                     checked={checkedItems[val.id]}
                     onChange={handleCheckboxChange}
                   />
-                  </td>
-                  <td>{val.collection_name}</td>
-                  <td>{val.description}</td>
-                  <td>{val.category_name}</td>
+                  </td>}
+                  <td>{val.id}</td>
+                  <td>{val.name}</td>
+                  <td>{val.tags}</td>
               </tr>)
             })}
           </tbody>

@@ -4,7 +4,7 @@ const db = require('../db/db');
 
 const getMyColl = (req, res) => {
     const getCollectionsQuery = `
-        SELECT c.id, c.name AS collection_name, c.description, cat.name AS category_name
+        SELECT c.id, c.name AS collection_name, c.description, cat.name AS category_name, c.items
         FROM collections c
         INNER JOIN categories cat ON c.category_id = cat.id
         WHERE c.user_id = ?`;
@@ -57,7 +57,6 @@ router.post('/delete', (req, res) => {
 router.post('/create', (req, res) => {
     let {name, description, category, user_id, customNames} = req.body
     let values = [name, description, category, user_id]
-    const oldInsertCollQuery = 'INSERT INTO collections (`name`, `description`, `category_id`, `user_id`) VALUES (?, ?, (SELECT id FROM categories WHERE name = ?), ?)'
     let queryFields = 'INSERT INTO collections (`name`, `description`, `category_id`, `user_id`'
     let queryValues = 'VALUES (?, ?, (SELECT id FROM categories WHERE name = ?), ?'
     console.log(customNames)
@@ -110,6 +109,47 @@ router.get('/categories', (req, res) => {
             return res.json('Error')
         }
         return res.json(data)
+    })
+})
+
+router.post('/newItem', (req, res) => {
+    const {coll_id, item_id} = req.body
+    const oldItemsQuery = 'SELECT items FROM collections WHERE id = ?'
+    db.query(oldItemsQuery, [coll_id], (err, data) => {
+        if (err) {
+            console.log('Database error:', err)
+            return res.json('Error')
+        }
+        const oldItems = data[0].items
+        const newItems = oldItems != '' ? `${oldItems},${item_id}` : item_id
+        const updateItemsQuery = 'UPDATE collections SET items = ? WHERE id = ?';
+        db.query(updateItemsQuery, [newItems, coll_id], (err, data) => {
+            if (err) {
+                console.log('Database error:', err)
+                return res.json('Error')
+            }
+            return res.json(`Item with id ${item_id} added to collection items`)
+        })
+    })
+
+})
+
+router.post('/getItems', (req, res) => {
+    const getItemsQuery = 'SELECT items FROM collections WHERE id = ?'
+    db.query(getItemsQuery, [req.body.coll_id], (err, data) => {
+        if (err) {
+            console.log('Database error:', err)
+            return res.json('Error')
+        }
+        const itemIds = data[0].items.split(',');
+        const getItemsInfoQuery = 'SELECT * FROM items WHERE id IN (?)';
+        db.query(getItemsInfoQuery, [itemIds], (err, data) => {
+            if (err) {
+                console.log('Database error:', err)
+                return res.json('Error')
+            }
+            return res.json(data)
+        })
     })
 })
 

@@ -15,7 +15,7 @@ const MyPage = () => {
     }
     axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/collections/mycollections`, req)
     .then(res => {
-        setData(res.data)
+      setData(res.data)
     })
     .catch(err => console.log(err))
   }, [])
@@ -85,6 +85,7 @@ const MyPage = () => {
               <th>Name</th>
               <th>Description</th>
               <th>Category</th>
+              <th>Items</th>
             </tr>
           </thead>
           <tbody>
@@ -96,11 +97,13 @@ const MyPage = () => {
                     name={val.id}
                     checked={checkedItems[val.id]}
                     onChange={handleCheckboxChange}
+                    onClick={(e) => e.stopPropagation()}
                   />
                   </td>
                   <td>{val.collection_name}</td>
                   <td>{val.description}</td>
                   <td>{val.category_name}</td>
+                  <td>{val.items == '' ? 0 : val.items.split(',').length}</td>
               </tr>)
             })}
           </tbody>

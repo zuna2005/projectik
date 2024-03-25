@@ -9,6 +9,7 @@ import Tabs from './Tabs'
 import NewCollection from './NewCollection'
 import CollectionPage from './CollectionPage'
 import NewItem from './NewItem'
+import ItemPage from './ItemPage'
 
 function App() {
   const user = useSelector(state => state.login.currentUser)
@@ -24,6 +25,7 @@ function App() {
         <Route path='/my-page/new-collection' element={<NewCollection />} />
         <Route path='/collection-page/:coll_id' element={<CollectionPage />} />
         <Route path='/collection-page/:coll_id/new-item' element={<NewItem />} />
+        <Route path='/item-page/:item_id' element={<ItemPage />} />
       </Routes>
     </BrowserRouter>
   )

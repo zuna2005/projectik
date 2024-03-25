@@ -7,8 +7,8 @@ import Trash from '../assets/trash.svg'
 
 const NewCollection = () => {
     const user = useSelector(state => state.login.currentUser)
-    const [categories, setCategories] = useState([])
     const navigate = useNavigate()
+
     const [customFields, setCustomFields] = useState({
         'Integer': 0,
         'String': 0,
@@ -25,6 +25,7 @@ const NewCollection = () => {
     })
     const [newField, setNewField] = useState('')
     const [newFieldName, setNewFieldName] = useState('')
+    const [categories, setCategories] = useState([])
 
     useEffect(() =>{
         axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/collections/categories`)
