@@ -24,7 +24,7 @@ const CollectionPage = () => {
       console.log('updUser', updUser)
       dispatch(setUser(updUser))
     }
-    getUpdUser()
+    user.status != '' && getUpdUser()
     axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/collections/getcollection`, {coll_id})
     .then(res => {
         setCollection(res.data[0])

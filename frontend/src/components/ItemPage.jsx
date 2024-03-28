@@ -26,7 +26,7 @@ const ItemPage = () => {
       console.log('updUser', updUser)
       dispatch(setUser(updUser))
     }
-    getUpdUser()
+    user.status != '' && getUpdUser()
     axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/items/getById`, {item_id})
     .then(async res => {
       const itemsWithTags = await fetchItemsAndTags(res.data)
