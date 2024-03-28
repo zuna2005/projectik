@@ -1,62 +1,42 @@
 import React, { useEffect, useState } from 'react'
 import { NavLink, useNavigate, useParams } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
+import fetchItemsAndTags from '../helpers/fetchItemsAndTags'
+import updateUser from '../helpers/UpdateUser'
+import { setUser } from "../features/loginSlice"
 import New from '../assets/plus.svg'
 import Trash from '../assets/trash.svg'
 import Edit from '../assets/edit.svg'
+import Back from '../assets/arrow-left.svg'
 
 const CollectionPage = () => {
   let { coll_id } = useParams()
   const user = useSelector(state => state.login.currentUser)
+  const dispatch = useDispatch()
   const navigate = useNavigate()
 
   const [collection, setCollection] = useState({})
   const [items, setItems] = useState([])
   useEffect(() =>{
+    const getUpdUser = async () => {
+      const updUser = await updateUser(user.id)
+      console.log('updUser', updUser)
+      dispatch(setUser(updUser))
+    }
+    getUpdUser()
     axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/collections/getcollection`, {coll_id})
     .then(res => {
         setCollection(res.data[0])
-        console.log(res.data[0])
     })
     .catch(err => console.log(err))
-    // axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/collections/getItems`, {coll_id})
-    // .then(res => {
-    //     setItems(res.data)
-    //     console.log(res.data)
-    // })
-    // .catch(err => console.log(err))
-    const getTags = async (ids) => {
-      try {
-        const response = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/tags/byId`, { ids })
-        const tags = response.data.map(val => '#' + val.name).join(', ')
-        return tags
-      } catch (error) {
-        console.error('Error fetching tags:', error)
-        return []
-      }
-    }
+    axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/items/getByColl`, { coll_id })
+    .then(async res => {
+      const itemsWithTags = await fetchItemsAndTags(res.data)
+      setItems(itemsWithTags)
+    })
+    .catch(err => console.log(err))
 
-    const fetchItemsAndTags = async () => {
-      try {
-        const itemsResponse = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/collections/getItems`, { coll_id });
-        const itemsData = itemsResponse.data
-
-        const tagsPromises = itemsData.map(item => getTags(item.tags));
-        const tagsData = await Promise.all(tagsPromises);
-  
-        const itemsWithTags = itemsData.map((item, index) => ({
-          ...item,
-          tags: tagsData[index]
-        }));
-  
-        setItems(itemsWithTags);
-      } catch (error) {
-        console.error('Error fetching items:', error);
-      }
-    };
-  
-    fetchItemsAndTags();
   }, [])
 
   const [checkedItems, setCheckedItems] = useState({})
@@ -66,7 +46,7 @@ const CollectionPage = () => {
     setCheckedItems(prev => ({...prev, [event.target.name]: event.target.checked}));
     console.log(checkedItems)
     let updCheckedItems = {...checkedItems, [event.target.name]: event.target.checked}
-    if (Object.values(updCheckedItems).length === data.length) {
+    if (Object.values(updCheckedItems).length === items.length) {
       setAllChecked(Object.values(updCheckedItems).every(checked => checked === true))
     }
     else {setAllChecked(false)}
@@ -76,18 +56,54 @@ const CollectionPage = () => {
   const handleCheckboxChangeAll = (event) => {
     let result = {}
     setAllChecked(event.target.checked)
-    for (let i in data) {
-      result[data[i].id] = event.target.checked
+    for (let i in items) {
+      result[items[i].id] = event.target.checked
     }
     setCheckedItems(result)
   }
-  const handleDeleteCollection = () => {
-    axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/collections/delete`, {ids: [coll_id]})
+  const handleDeleteCollection = async () => {
+    const updUser = await updateUser(user.id)
+    if (updUser.status === 'Active') {
+      axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/collections/delete`, {ids: [coll_id]})
       .then(res => {
         console.log(res)
         navigate('/my-page')
       })
       .catch(err => console.log(err))
+      axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/items/deleteColl`, {ids: [coll_id]})
+      .then(res => {
+        console.log(res.data)
+      })
+      .catch(err => console.log(err))
+    } else {
+      dispatch(setUser(updUser))
+    } 
+  }
+  const handleDeleteItems = async () => {
+    const updUser = await updateUser(user.id)
+    if (updUser.status === 'Active') {
+      let data = {
+        ids: [],
+        coll_id
+      }
+      for (let id in checkedItems) {checkedItems[id] && data.ids.push(id)}
+      console.log(data)
+      if (data.ids.length) {
+        axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/items/delete`, data)
+        .then(async res => {
+          const itemsWithTags = await fetchItemsAndTags(res.data)
+          setItems(itemsWithTags)
+        })
+        .catch(err => console.log(err))
+        axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/collections/items-count`, {coll_id, change: (-1 * data.ids.length)})
+        .then(res => {
+          console.log(res.data)
+        })
+        .catch(err => console.log(err))
+      }
+    } else {
+      dispatch(setUser(updUser))
+    } 
   } 
   const handleItemPage = (e, item_id) => {
     e.preventDefault()
@@ -97,10 +113,15 @@ const CollectionPage = () => {
     <div className='d-flex flex-column align-items-center'>
       <div className='d-flex flex-column w-75'>
         <div className="text-center my-4 position-relative">
+          <div className="position-absolute" style={{top: '0px', left: '0px'}}>
+            <button className='btn btn-outline-dark me-2' onClick={() => navigate(-1)}>
+              <img src={Back} width={25} height={25}/> Back
+            </button>
+          </div>
           <h3 className="w-100 text-center" style={{right: '50%'}}>Collection "{collection.name}"</h3>
           {user.id === collection.user_id &&
           <div className="position-absolute" style={{top: '0px', right: '0px'}}>
-            <NavLink to='new-collection' className='btn btn-outline-dark me-2'>
+            <NavLink to='edit-collection' className='btn btn-outline-dark me-2'>
               <img src={Edit} width={25} height={25}/> Edit
             </NavLink>
             <button className='btn btn-outline-dark' onClick={handleDeleteCollection}>
@@ -135,7 +156,7 @@ const CollectionPage = () => {
           <NavLink to='new-item' className='btn btn-outline-dark me-2'>
           <img src={New} width={25} height={25}/> New
           </NavLink>
-          <button className='btn btn-outline-dark'>
+          <button className='btn btn-outline-dark' onClick={handleDeleteItems}>
           <img src={Trash} width={25} height={25}/> Delete
           </button>
         </div>}
@@ -144,12 +165,16 @@ const CollectionPage = () => {
             <tr>
               {user.id === collection.user_id &&
               <th>
-                <input className="form-check-input me-1" type="checkbox" checked={allChecked} onChange={handleCheckboxChangeAll}/>
+                <input 
+                  className="form-check-input me-1" 
+                  type="checkbox" 
+                  checked={allChecked} 
+                  onChange={handleCheckboxChangeAll}/>
               </th>}
               <th>id</th>
               <th>name</th>
               <th>tags</th>
-              {Object.keys(collection).filter(val => val.includes('state') && collection[val] == 1).map(val => {
+              {Object.keys(collection).filter(val => val.includes('state') && collection[val] == 1 && !val.includes('text')).map(val => {
                 let fieldName = val.slice(0, val.indexOf('state')) + 'name'
                 return (
                   <th>{collection[fieldName]}</th>
@@ -158,20 +183,27 @@ const CollectionPage = () => {
             </tr>
           </thead>
           <tbody>
-            {items.map((val) => {
-              return (<tr key={val.id} onClick={(e) => handleItemPage(e, val.id)}>
+            {items.map((item) => {
+              return (<tr key={item.id} onClick={(e) => handleItemPage(e, item.id)}>
                 {user.id === collection.user_id &&
                 <td>
                   <input 
                     type="checkbox"
-                    name={val.id}
-                    checked={checkedItems[val.id]}
+                    name={item.id}
+                    checked={checkedItems[item.id]}
                     onChange={handleCheckboxChange}
+                    onClick={(e) => e.stopPropagation()}
                   />
                   </td>}
-                  <td>{val.id}</td>
-                  <td>{val.name}</td>
-                  <td>{val.tags}</td>
+                  <td>{item.id}</td>
+                  <td>{item.name}</td>
+                  <td>{item.tags}</td>
+                  {Object.keys(item).filter(val => val.includes('state') && item[val] == 1 && !val.includes('text')).map(val => {
+                    let fieldName = val.slice(0, val.indexOf('state')) + 'value'
+                    return (
+                      <td>{item[fieldName] || '-'}</td>
+                    )
+                  })}
               </tr>)
             })}
           </tbody>

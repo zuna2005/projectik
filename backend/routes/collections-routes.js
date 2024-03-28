@@ -4,7 +4,7 @@ const db = require('../db/db');
 
 const getMyColl = (req, res) => {
     const getCollectionsQuery = `
-        SELECT c.id, c.name AS collection_name, c.description, cat.name AS category_name, c.items
+        SELECT c.id, c.name AS collection_name, c.description, cat.name AS category_name, c.items_count
         FROM collections c
         INNER JOIN categories cat ON c.category_id = cat.id
         WHERE c.user_id = ?`;
@@ -37,6 +37,23 @@ router.post('/mycollections', getMyColl)
 
 router.post('/getcollection', getColl)
 
+router.get('/top5', (req, res) => {
+    const getTop5Query = `SELECT c.id, c.name, c.description, u.name AS user_name, cat.name AS category_name, c.items_count
+    FROM collections c
+    JOIN users u ON c.user_id = u.id
+    JOIN categories cat ON c.category_id = cat.id
+    ORDER BY c.items_count DESC
+    LIMIT 5;
+    `
+    db.query(getTop5Query, (err, data) => {
+        if (err) {
+            console.error('Database error: ', err)
+            return res.json('Error')
+        }
+        return res.json(data)
+    })
+})
+
 router.post('/delete', (req, res) => {
     let error = false;
     const deleteQuery = 'DELETE FROM collections WHERE id = ?'
@@ -59,9 +76,7 @@ router.post('/create', (req, res) => {
     let values = [name, description, category, user_id]
     let queryFields = 'INSERT INTO collections (`name`, `description`, `category_id`, `user_id`'
     let queryValues = 'VALUES (?, ?, (SELECT id FROM categories WHERE name = ?), ?'
-    console.log(customNames)
     for (let fieldType of Object.keys(customNames)) {
-        console.log(fieldType)
         let dbFieldType = ''
         switch (fieldType) {
             case ('String'):
@@ -80,12 +95,9 @@ router.post('/create', (req, res) => {
                 dbFieldType = 'date'
                 break
         }
-        console.log(dbFieldType)
         for (let i = 1; i <= customNames[fieldType].length; i++) {
             queryFields += ', ' + `custom_${dbFieldType}${i}_state, custom_${dbFieldType}${i}_name`
             queryValues += ', ' + `true, '${customNames[fieldType][i - 1]}'`
-            // values.push('true')
-            // values.push(customNames[fieldType][i - 1])
         }
     }
     queryFields += ') '
@@ -112,44 +124,51 @@ router.get('/categories', (req, res) => {
     })
 })
 
-router.post('/newItem', (req, res) => {
-    const {coll_id, item_id} = req.body
-    const oldItemsQuery = 'SELECT items FROM collections WHERE id = ?'
+router.post('/items-count', (req, res) => {
+    const {coll_id, change} = req.body
+    const oldItemsQuery = 'SELECT items_count FROM collections WHERE id = ?'
     db.query(oldItemsQuery, [coll_id], (err, data) => {
         if (err) {
             console.log('Database error:', err)
             return res.json('Error')
         }
-        const oldItems = data[0].items
-        const newItems = oldItems != '' ? `${oldItems},${item_id}` : item_id
-        const updateItemsQuery = 'UPDATE collections SET items = ? WHERE id = ?';
+        const newItems = data[0].items_count + change
+        const updateItemsQuery = 'UPDATE collections SET items_count = ? WHERE id = ?'
         db.query(updateItemsQuery, [newItems, coll_id], (err, data) => {
             if (err) {
                 console.log('Database error:', err)
                 return res.json('Error')
             }
-            return res.json(`Item with id ${item_id} added to collection items`)
+            return res.json(`Item count changed by ${change}`)
         })
     })
-
 })
 
-router.post('/getItems', (req, res) => {
-    const getItemsQuery = 'SELECT items FROM collections WHERE id = ?'
-    db.query(getItemsQuery, [req.body.coll_id], (err, data) => {
+router.post('/deleteCustomField', (req, res) => {
+    const { field, coll_id } = req.body
+    let query = `UPDATE collections SET ${field}state = ?, ${field}name = ? WHERE id = ?`
+    db.query(query, [false, null, coll_id], (err, data) => {
+        if (err) {
+            console.error('Database error', err)
+            return res.json('deleteCustomField error')
+        }
+        return res.json(`Custom field ${field} deleted from collections`)
+    })
+})
+
+router.post('/update', (req, res) => {
+    let query = 'UPDATE collections SET '
+    let keys = Object.keys(req.body)
+    for (let key of keys.slice(0, keys.length - 1)) {
+        query += query.endsWith('SET ') ? `${key} = ?` : `, ${key} = ?`
+    }
+    query += ' WHERE id = ?'
+    db.query(query, Object.values(req.body), (err, data) => {
         if (err) {
             console.log('Database error:', err)
             return res.json('Error')
         }
-        const itemIds = data[0].items.split(',');
-        const getItemsInfoQuery = 'SELECT * FROM items WHERE id IN (?)';
-        db.query(getItemsInfoQuery, [itemIds], (err, data) => {
-            if (err) {
-                console.log('Database error:', err)
-                return res.json('Error')
-            }
-            return res.json(data)
-        })
+        return res.json(`collection with id ${req.body.coll_id} updated`)
     })
 })
 

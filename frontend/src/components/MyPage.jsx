@@ -1,15 +1,24 @@
 import React, { useState, useEffect } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
-import {useSelector} from 'react-redux'
+import {useDispatch, useSelector} from 'react-redux'
 import axios from 'axios'
+import updateUser from '../helpers/UpdateUser'
+import { setUser } from "../features/loginSlice"
 import New from '../assets/plus.svg'
 import Trash from '../assets/trash.svg'
 
 const MyPage = () => {
   const user = useSelector(state => state.login.currentUser)
+  const dispatch = useDispatch()
   const navigate = useNavigate()
   const [data, setData] = useState([])
   useEffect(() =>{
+    const getUpdUser = async () => {
+      const updUser = await updateUser(user.id)
+      console.log('updUser', updUser)
+      dispatch(setUser(updUser))
+    }
+    getUpdUser()
     let req = {
       user_id: user.id
     }
@@ -42,20 +51,30 @@ const MyPage = () => {
     }
     setCheckedItems(result)
   }
-  const handleDelete = () => {
-    let data = {
-      ids: [],
-      user_id: user.id
-    }
-    for (let id in checkedItems) {checkedItems[id] && data.ids.push(id)}
-    console.log(data)
-    if (data.ids.length) {
-      axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/collections/delete`, data)
-      .then(res => {
-        console.log(res)
-        setData(res.data)
-      })
-      .catch(err => console.log(err))
+  const handleDelete = async () => {
+    const updUser = await updateUser(user.id)
+    if (updUser.status === 'Active') {
+      let data = {
+        ids: [],
+        user_id: user.id
+      }
+      for (let id in checkedItems) {checkedItems[id] && data.ids.push(id)}
+      console.log(data)
+      if (data.ids.length) {
+        axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/collections/delete`, data)
+        .then(res => {
+          console.log(res)
+          setData(res.data)
+        })
+        .catch(err => console.log(err))
+        axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/items/deleteColl`, data)
+        .then(res => {
+          console.log(res.data)
+        })
+        .catch(err => console.log(err))
+      }
+    } else {
+      dispatch(setUser(updUser))
     }    
   }
   const handleCollectionPage = (e, coll_id) => {
@@ -80,7 +99,7 @@ const MyPage = () => {
           <thead>
             <tr>
               <th >
-                <input className="form-check-input me-1" type="checkbox" checked={allChecked} onChange={handleCheckboxChangeAll}/>
+                <input className="form-check-input" type="checkbox" checked={allChecked} onChange={handleCheckboxChangeAll}/>
               </th>
               <th>Name</th>
               <th>Description</th>
@@ -103,7 +122,7 @@ const MyPage = () => {
                   <td>{val.collection_name}</td>
                   <td>{val.description}</td>
                   <td>{val.category_name}</td>
-                  <td>{val.items == '' ? 0 : val.items.split(',').length}</td>
+                  <td>{val.items_count}</td>
               </tr>)
             })}
           </tbody>

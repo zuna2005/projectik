@@ -8,100 +8,110 @@ datasource db {
 }
 
 model categories {
-  id   Int    @id @default(autoincrement())
-  name String @db.VarChar(255)
+  id          Int           @id @default(autoincrement())
+  name        String        @db.VarChar(255)
+  collections collections[]
 }
 
 model collections {
-  id                     Int      @id @default(autoincrement())
+  id                     Int        @id @default(autoincrement())
   user_id                Int
+  user                   users      @relation(fields: [user_id], references: [id])
   category_id            Int
-  name                   String   @db.VarChar(255)
-  description            String   @db.VarChar(255)
-  image_url              String?  @db.VarChar(255)
-  custom_string1_state   Boolean? @default(false)
-  custom_string1_name    String?  @db.VarChar(255)
-  custom_string2_state   Boolean? @default(false)
-  custom_string2_name    String?  @db.VarChar(255)
-  custom_string3_state   Boolean? @default(false)
-  custom_string3_name    String?  @db.VarChar(255)
-  custom_int1_state      Boolean? @default(false)
-  custom_int1_name       String?  @db.VarChar(255)
-  custom_int2_state      Boolean? @default(false)
-  custom_int2_name       String?  @db.VarChar(255)
-  custom_int3_state      Boolean? @default(false)
-  custom_int3_name       String?  @db.VarChar(255)
-  custom_text1_state     Boolean? @default(false)
-  custom_text1_name      String?  @db.VarChar(255)
-  custom_text2_state     Boolean? @default(false)
-  custom_text2_name      String?  @db.VarChar(255)
-  custom_text3_state     Boolean? @default(false)
-  custom_text3_name      String?  @db.VarChar(255)
-  custom_checkbox1_state Boolean? @default(false)
-  custom_checkbox1_name  String?  @db.VarChar(255)
-  custom_checkbox2_state Boolean? @default(false)
-  custom_checkbox2_name  String?  @db.VarChar(255)
-  custom_checkbox3_state Boolean? @default(false)
-  custom_checkbox3_name  String?  @db.VarChar(255)
-  custom_date1_state     Boolean? @default(false)
-  custom_date1_name      String?  @db.VarChar(255)
-  custom_date2_state     Boolean? @default(false)
-  custom_date2_name      String?  @db.VarChar(255)
-  custom_date3_state     Boolean? @default(false)
-  custom_date3_name      String?  @db.VarChar(255)
-  items                  String?  @default("") @db.VarChar(2000)
+  category               categories @relation(fields: [category_id], references: [id])
+  name                   String     @db.VarChar(255)
+  description            String     @db.VarChar(255)
+  image_url              String?    @db.VarChar(255)
+  custom_string1_state   Boolean?   @default(false)
+  custom_string1_name    String?    @db.VarChar(255)
+  custom_string2_state   Boolean?   @default(false)
+  custom_string2_name    String?    @db.VarChar(255)
+  custom_string3_state   Boolean?   @default(false)
+  custom_string3_name    String?    @db.VarChar(255)
+  custom_int1_state      Boolean?   @default(false)
+  custom_int1_name       String?    @db.VarChar(255)
+  custom_int2_state      Boolean?   @default(false)
+  custom_int2_name       String?    @db.VarChar(255)
+  custom_int3_state      Boolean?   @default(false)
+  custom_int3_name       String?    @db.VarChar(255)
+  custom_text1_state     Boolean?   @default(false)
+  custom_text1_name      String?    @db.VarChar(255)
+  custom_text2_state     Boolean?   @default(false)
+  custom_text2_name      String?    @db.VarChar(255)
+  custom_text3_state     Boolean?   @default(false)
+  custom_text3_name      String?    @db.VarChar(255)
+  custom_checkbox1_state Boolean?   @default(false)
+  custom_checkbox1_name  String?    @db.VarChar(255)
+  custom_checkbox2_state Boolean?   @default(false)
+  custom_checkbox2_name  String?    @db.VarChar(255)
+  custom_checkbox3_state Boolean?   @default(false)
+  custom_checkbox3_name  String?    @db.VarChar(255)
+  custom_date1_state     Boolean?   @default(false)
+  custom_date1_name      String?    @db.VarChar(255)
+  custom_date2_state     Boolean?   @default(false)
+  custom_date2_name      String?    @db.VarChar(255)
+  custom_date3_state     Boolean?   @default(false)
+  custom_date3_name      String?    @db.VarChar(255)
+  items_ids              String?    @default("") @db.VarChar(2000)
+  items                  items[]
 }
 
 model items {
-  id                     Int      @id @default(autoincrement())
+  id                     Int         @id @default(autoincrement())
   user_id                Int
+  user                   users       @relation(fields: [user_id], references: [id])
   collection_id          Int
-  name                   String   @db.VarChar(255)
-  tags                   String   @db.VarChar(255)
-  custom_string1_state   Boolean? @default(false)
-  custom_string1_value   String?  @db.VarChar(255)
-  custom_string2_state   Boolean? @default(false)
-  custom_string2_value   String?  @db.VarChar(255)
-  custom_string3_state   Boolean? @default(false)
-  custom_string3_value   String?  @db.VarChar(255)
-  custom_int1_state      Boolean? @default(false)
+  collection             collections @relation(fields: [collection_id], references: [id])
+  name                   String      @db.VarChar(255)
+  tags_ids               String      @db.VarChar(255)
+  tags                   tags[]
+  custom_string1_state   Boolean?    @default(false)
+  custom_string1_value   String?     @db.VarChar(255)
+  custom_string2_state   Boolean?    @default(false)
+  custom_string2_value   String?     @db.VarChar(255)
+  custom_string3_state   Boolean?    @default(false)
+  custom_string3_value   String?     @db.VarChar(255)
+  custom_int1_state      Boolean?    @default(false)
   custom_int1_value      Int?
-  custom_int2_state      Boolean? @default(false)
+  custom_int2_state      Boolean?    @default(false)
   custom_int2_value      Int?
-  custom_int3_state      Boolean? @default(false)
+  custom_int3_state      Boolean?    @default(false)
   custom_int3_value      Int?
-  custom_text1_state     Boolean? @default(false)
-  custom_text1_value     String?  @db.Text
-  custom_text2_state     Boolean? @default(false)
-  custom_text2_value     String?  @db.Text
-  custom_text3_state     Boolean? @default(false)
-  custom_text3_value     String?  @db.Text
-  custom_checkbox1_state Boolean? @default(false)
+  custom_text1_state     Boolean?    @default(false)
+  custom_text1_value     String?     @db.Text
+  custom_text2_state     Boolean?    @default(false)
+  custom_text2_value     String?     @db.Text
+  custom_text3_state     Boolean?    @default(false)
+  custom_text3_value     String?     @db.Text
+  custom_checkbox1_state Boolean?    @default(false)
   custom_checkbox1_value Boolean?
-  custom_checkbox2_state Boolean? @default(false)
+  custom_checkbox2_state Boolean?    @default(false)
   custom_checkbox2_value Boolean?
-  custom_checkbox3_state Boolean? @default(false)
+  custom_checkbox3_state Boolean?    @default(false)
   custom_checkbox3_value Boolean?
-  custom_date1_state     Boolean? @default(false)
-  custom_date1_value     String?  @db.VarChar(255)
-  custom_date2_state     Boolean? @default(false)
-  custom_date2_value     String?  @db.VarChar(255)
-  custom_date3_state     Boolean? @default(false)
-  custom_date3_value     String?  @db.VarChar(255)
+  custom_date1_state     Boolean?    @default(false)
+  custom_date1_value     String?     @db.VarChar(255)
+  custom_date2_state     Boolean?    @default(false)
+  custom_date2_value     String?     @db.VarChar(255)
+  custom_date3_state     Boolean?    @default(false)
+  custom_date3_value     String?     @db.VarChar(255)
 }
 
 model tags {
-  id   Int    @id @default(autoincrement())
-  name String @db.VarChar(255)
+  id    Int     @id @default(autoincrement())
+  name  String  @db.VarChar(255)
+  items items[]
 }
 
 model users {
-  id       Int           @id @default(autoincrement())
-  name     String        @db.VarChar(255)
-  email    String        @unique(map: "email") @db.VarChar(255)
-  password String        @db.VarChar(255)
-  status   users_status? @default(Active)
-  admin    Boolean?      @default(false)
+  id          Int           @id @default(autoincrement())
+  name        String        @db.VarChar(255)
+  email       String        @unique(map: "email") @db.VarChar(255)
+  password    String        @db.VarChar(255)
+  status      users_status? @default(Active)
+  admin       Boolean?      @default(false)
+  collections collections[]
+  items       items[]
 }
 
 enum users_status {

@@ -6,13 +6,15 @@ import axios from 'axios'
 import updateUser from '../helpers/UpdateUser'
 import { setUser } from "../features/loginSlice"
 
-const NewItem = () => {
+const EditItem = () => {
     const user = useSelector(state => state.login.currentUser)
     const navigate = useNavigate()
     const dispatch = useDispatch()
-    let { coll_id } = useParams()
+    let { item_id } = useParams()
+    const [item, setItem] = useState({})
     const [collection, setCollection] = useState({})
     const [selectedTags, setSelectedTags] = useState([])
+    const [defaultOptions, setDefaultOptions] = useState([])
     const [options, setOptions] = useState([])
     const [checkboxes, setCheckboxes] = useState({})
     useEffect(() =>{
@@ -24,20 +26,33 @@ const NewItem = () => {
         getUpdUser()
         axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/tags/allTags`)
         .then(res => {
-            const data = res.data.map(val => ({ value: val.id, label: val.name }));
-            setOptions(data)
-        })
-        .catch(err => console.log(err))
-        axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/collections/getcollection`, {coll_id})
-        .then(res => {
-            const coll = res.data[0]
-            setCollection(coll)
-            Object.keys(coll).filter(val => val.includes('state') && coll[val] == 1 && val.includes('checkbox')).map(val => {
-                const field = val.slice(0, val.indexOf('state'))
-                setCheckboxes(prev => ({...prev, [field]: false}))
+            const opt = res.data.map(val => ({ value: val.id, label: val.name }))
+            setOptions(opt)
+            axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/items/getById`, {item_id})
+            .then(res => {
+                const init_item = res.data[0]
+                const defOpt = []
+                setItem(init_item)
+                init_item.tags.split(',').map(tag_id => {
+                    defOpt.push(opt.find(val => val.value == tag_id))
+                })
+                setDefaultOptions(defOpt)
+                axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/collections/getcollection`, {coll_id: res.data[0].collection_id})
+                .then(res => {
+                    const coll = res.data[0]
+                    setCollection(coll)
+                    Object.keys(coll).filter(val => val.includes('state') && coll[val] == 1 && val.includes('checkbox')).map(val => {
+                        const field = val.slice(0, val.indexOf('state'))
+                        const value = init_item[field + 'value'] == 1 ? true : false
+                        setCheckboxes(prev => ({...prev, [field]: value}))
+                    })
+                })
+                .catch(err => console.log(err))
             })
+            .catch(err => console.log(err))
         })
         .catch(err => console.log(err))
+        
       }, [])
     const handleTagChange = (selectedOption) => {
         setSelectedTags(selectedOption)
@@ -66,14 +81,17 @@ const NewItem = () => {
                     console.error(error);
                 }
             }
+            if (!selectedTags.length) {
+                tagsIds = defaultOptions.map(val => val.value)
+            }
             console.log('ids of tags', tagsIds)
 
             let formData = new FormData(e.target)
             const itemData = {
                 user_id: user.id,
-                collection_id: coll_id,
+                collection_id: collection.id,
                 name: formData.get('name'),
-                tags: tagsIds.join(',')
+                tags: tagsIds.join(','),
             }
             for (let pair of formData.entries()) {
                 if (pair[0].includes('custom') && !pair[0].includes('checkbox')) {
@@ -85,24 +103,21 @@ const NewItem = () => {
                 itemData[val + 'state'] = true
                 itemData[val + 'value'] = checkboxes[val]
             })
+            itemData['item_id'] = item_id
             console.log(itemData)
-            axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/items/create`, itemData)
+            axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/items/update`, itemData)
             .then(res => {
-                axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/collections/items-count`, {coll_id, change: 1})
-                .then(res => {
-                navigate(`/collection-page/${coll_id}`)
-                })
-                .catch(err => console.log(err))
+                navigate(`/item-page/${item_id}`)
                 })
             .catch(err => console.log(err))
         } else {
             dispatch(setUser(updUser))
-        } 
+        }
     }
   return (
     <div className='d-flex flex-column align-items-center'>
         <div className='d-flex flex-column w-75 mt-4'>
-            <h3>New Item</h3>
+            <h3>Edit Item</h3>
             <form onSubmit={handleSubmit}>
                 <div className='container'>
                     <div className='row'>
@@ -110,7 +125,14 @@ const NewItem = () => {
                             <label htmlFor="item-name" className="form-label">Name</label>
                         </div>
                         <div className='col-6 w-75'>
-                            <input type="text" className="form-control" id="item-name" name='name' placeholder="My Item" required />
+                            <input 
+                                type="text" 
+                                className="form-control" 
+                                id="item-name" 
+                                name='name' 
+                                placeholder="My Item" 
+                                defaultValue={item.name}
+                                required />
                         </div>
                     </div>
                     <div className='row mt-3'>
@@ -118,7 +140,15 @@ const NewItem = () => {
                             <label htmlFor="tags" className="form-label">Tags</label>
                         </div>
                         <div className='col-6 w-75'>
-                            <CreatableSelect isMulti options={options} onChange={handleTagChange} required/>
+                        {defaultOptions.length > 0 && (
+                        <CreatableSelect 
+                            isMulti 
+                            options={options} 
+                            defaultValue={defaultOptions}
+                            onChange={handleTagChange} 
+                            required
+                        />
+                        )}
                         </div>
                     </div>
                     <hr />
@@ -128,19 +158,42 @@ const NewItem = () => {
                         const fieldName = field + 'name'
                         const fieldType = () => {
                             if (val.includes('string')) {
-                                return <input type="text" className="form-control" name={field} placeholder="String value" />
+                                return <input 
+                                    type="text" 
+                                    className="form-control" 
+                                    name={field} 
+                                    defaultValue={item[field + 'value']} 
+                                    placeholder="String value" />
                             }
                             if (val.includes('int')) {
-                                return <input type="number" className="form-control" name={field} placeholder="Integer value" />
+                                return <input 
+                                    type="number" 
+                                    className="form-control" 
+                                    name={field}
+                                    defaultValue={item[field + 'value']} 
+                                    placeholder="Integer value" />
                             }
                             if (val.includes('text')) {
-                                return <textarea className="form-control" name={field} placeholder="Text value" />
+                                return <textarea 
+                                    className="form-control" 
+                                    name={field} 
+                                    defaultValue={item[field + 'value']}
+                                    placeholder="Text value" />
                             }
                             if (val.includes('checkbox')) {
-                                return <input type="checkbox" className="form-check-input" name={field} onChange={handleCheckboxChange}/>
+                                return <input 
+                                    type="checkbox" 
+                                    className="form-check-input" 
+                                    name={field}
+                                    onChange={handleCheckboxChange}
+                                    defaultChecked = {item[field + 'value'] == 1}/>
                             }
                             if (val.includes('date')) {
-                                return <input type="date" className="form-control form-control-date" name={field} />
+                                return <input 
+                                    type="date" 
+                                    className="form-control form-control-date" 
+                                    name={field} 
+                                    defaultValue={item[field + 'value']} />
                             }
                         }
                         return (
@@ -155,8 +208,8 @@ const NewItem = () => {
                         )
                     })}
                 <div className='mt-4'>
-                    <button type='submit' className='btn btn-outline-success me-3'>Create</button>
-                    <Link to={`/collection-page/${coll_id}`} className='btn btn-outline-danger'>Cancel</Link>
+                    <button type='submit' className='btn btn-outline-success me-3'>Save</button>
+                    <Link to={`/item-page/${item_id}`} className='btn btn-outline-danger'>Cancel</Link>
                 </div>
                 </div>
         </form>
@@ -165,4 +218,4 @@ const NewItem = () => {
   )
 }
 
-export default NewItem
+export default EditItem

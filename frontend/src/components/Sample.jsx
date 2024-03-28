@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import {useDispatch, useSelector} from 'react-redux'
 import axios from 'axios'
-import ValidateLogin from '../LoginValidation'
+import ValidateLogin from '../helpers/LoginValidation'
 import FormField from './FormField'
 import {setUser} from "../features/loginSlice"
 
@@ -51,12 +51,15 @@ const Form = ({heading}) => {
         else if (heading === 'Login' && Object.values(errorsTemp).slice(1).every(value => value === '')) {
             axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/users/login`, values)
             .then(res => {
-                dispatch(setUser({...res.data}))
-                document.getElementById('loginModal').classList.remove('show')
-                document.getElementsByClassName('modal-backdrop')[0].remove();
-                if (user.status === 'Blocked') {
+                console.log(res.data)
+                if (res.data.status === 'Blocked') {
                     setMessage(prev => ({...prev, text:"You're blocked and can no longer log into the system"}))
                 }
+                else {
+                    dispatch(setUser({...res.data}))
+                    document.getElementById('loginModal').classList.remove('show')
+                    document.getElementsByClassName('modal-backdrop')[0].remove()
+                }               
                 
             })
             .catch(err => {

@@ -3,6 +3,36 @@ const router = express.Router()
 const db = require('../db/db')
 const getHmac = require('../helpers/getHmac')
 
+const getAllUsers = (req, res) => {
+    const getAllQuery = 'SELECT * FROM users'
+    db.query(getAllQuery, (err, data) => {
+        if (err) {
+            console.error('Database Error: ', err)
+            return res.json('Error')
+        }
+        return res.json(data)
+    })
+}
+
+router.get('/all', getAllUsers)
+
+router.post('/change', (req, res) => {
+    const {ids, field, status} = req.body
+    let error = false
+    const query = status == 'delete' ? 'DELETE FROM users WHERE id = ?' : `UPDATE users SET ${field} = ? WHERE id = ?`
+    for (id of ids) {
+        const data = status == 'delete' ? [id] : [status, id]
+        db.query(query, data, (err, data) => {
+            if (err) {
+                console.error('Database error:', err);
+                error = true;
+                return res.json('Error');
+            }
+        })
+        if (error) {break;}
+    }
+    if(!error) {getAllUsers(req, res);} 
+})
 
 router.post('/signup', (req, res) => {
     const checkEmailQuery = 'SELECT * FROM users WHERE email = ?';
@@ -72,14 +102,14 @@ router.post('/login', (req, res) => {
 })
 
 router.post('/user', (req, res) => {
-    const getDataQuery = 'SELECT * FROM users where email = ?'; 
-    db.query(getDataQuery, [req.body.email], (err, data) => {
+    const getDataQuery = 'SELECT * FROM users where id = ?'; 
+    db.query(getDataQuery, [req.body.id], (err, data) => {
         if (err) {
             console.error('Database error:', err);
             return res.json('Error');
         }
         return res.json(data); 
     }) 
-})
+})  
 
 module.exports = router

@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import {useSelector} from 'react-redux'
+import {useDispatch, useSelector} from 'react-redux'
 import axios from 'axios'
+import updateUser from '../helpers/UpdateUser'
+import { setUser } from "../features/loginSlice"
 import New from '../assets/plus.svg'
 import Trash from '../assets/trash.svg'
 
 const NewCollection = () => {
     const user = useSelector(state => state.login.currentUser)
+    const dispatch = useDispatch()
     const navigate = useNavigate()
 
     const [customFields, setCustomFields] = useState({
@@ -28,29 +31,39 @@ const NewCollection = () => {
     const [categories, setCategories] = useState([])
 
     useEffect(() =>{
+        const getUpdUser = async () => {
+            const updUser = await updateUser(user.id)
+            console.log('updUser', updUser)
+            dispatch(setUser(updUser))
+        }
+        getUpdUser()
         axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/collections/categories`)
         .then(res => {
             setCategories(res.data)
         })
         .catch(err => console.log(err))
       }, [])
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault()
-        let formData = new FormData(event.target)
-        let values = {}
-        formData.append('user_id', user.id)
-        for (let pair of formData.entries()) {
-            console.log(pair[0] + ', ' + pair[1])
-            values[pair[0]] = pair[1]
-        }
-        values['customNames'] = customNames
+        const updUser = await updateUser(user.id)
+        if (updUser.status === 'Active') {
+            let formData = new FormData(event.target)
+            let values = {}
+            formData.append('user_id', user.id)
+            for (let pair of formData.entries()) {
+                values[pair[0]] = pair[1]
+            }
+            values['customNames'] = customNames
 
-        axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/collections/create`, values)
-        .then(res => {
-        console.log(res.data)
-        navigate('/my-page')
-        })
-        .catch(err => console.log(err))
+            axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/collections/create`, values)
+            .then(res => {
+            console.log(res.data)
+            navigate('/my-page')
+            })
+            .catch(err => console.log(err))
+        } else {
+            dispatch(setUser(updUser))
+        }
     }
     const handleCustomField = (event,val) => {
         event.preventDefault()
