@@ -17,6 +17,7 @@ import ItemPage from './ItemPage'
 import Admin from './Admin'
 import EditItem from './EditItem'
 import EditCollection from './EditCollection'
+import Search from './Search'
 
 function App() {
   const user = useSelector(state => state.login.currentUser)
@@ -39,6 +40,7 @@ function App() {
         <Route path='/' element={<LatestItems />} />
         <Route path='/largest-collections' element={<LargestCollections />} />
         <Route path='/tag-cloud' element={<TagCloud />} />
+        <Route path='/search' element={<Search />} />
         <Route path='/my-page' element={user.status == 'Active' ? <MyPage /> : <Navigate to='/' />} />
         <Route path='/my-page/new-collection' element={user.status == 'Active' ? <NewCollection /> : <Navigate to='/' />} />
         <Route path='/collection-page/:coll_id' element={<CollectionPage />} />

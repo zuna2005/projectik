@@ -1,5 +1,5 @@
-import React from 'react'
-import { NavLink } from 'react-router-dom'
+import React, { useState } from 'react'
+import { NavLink, useNavigate } from 'react-router-dom'
 import {useDispatch, useSelector} from 'react-redux'
 import Person from '../assets/person.svg'
 import Search from '../assets/search.svg'
@@ -13,8 +13,13 @@ import Sample from './Sample'
 const NavBar = () => {
     const dispatch = useDispatch()
     const user = useSelector(state => state.login.currentUser)
-    console.log("user:", user)
-
+    const navigate = useNavigate()
+    const [search, setSearch] = useState('')
+    const handleSearch = (e) => {
+        e.preventDefault()
+        navigate(`/search?query=${encodeURIComponent(search)}`)
+        setSearch('')
+    }
     const handleLogout = () => {
         dispatch(setUser({status: ''}))
     }
@@ -35,8 +40,14 @@ const NavBar = () => {
             </div>
             <form className="d-flex justify-content-center">
                 <div className="input-group" style={{ width: '500px' }}>
-                    <input className="form-control" type="search" placeholder="Search" />
-                    <button className="input-group-text" type="submit">
+                    <input 
+                        className="form-control" 
+                        type="search" 
+                        placeholder="Search" 
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        onBlur={() => setSearch('')} />
+                    <button className="input-group-text" type="submit" onClick={handleSearch}>
                         <img src={Search} width={25} height={25} />
                     </button>
                 </div>

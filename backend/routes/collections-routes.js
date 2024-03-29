@@ -1,18 +1,19 @@
-const express = require('express');
-const router = express.Router();
-const db = require('../db/db');
+const express = require('express')
+const router = express.Router()
+const db = require('../db/db')
+const { searchCollections } = require('../helpers/search')
 
 const getMyColl = (req, res) => {
     const getCollectionsQuery = `
         SELECT c.id, c.name AS collection_name, c.description, cat.name AS category_name, c.items_count
         FROM collections c
         INNER JOIN categories cat ON c.category_id = cat.id
-        WHERE c.user_id = ?`;
+        WHERE c.user_id = ?`
     
     db.query(getCollectionsQuery, [req.body.user_id], (err, data) => {
         if (err) {
-            console.error('Database error:', err);
-            return res.json('Error');
+            console.error('Database error:', err)
+            return res.json('Error')
         }
         return res.json(data);        
     });
@@ -51,6 +52,25 @@ router.get('/top5', (req, res) => {
             return res.json('Error')
         }
         return res.json(data)
+    })
+})
+
+router.post('/search', (req, res) => {
+    const { query } = req.body
+    const getAllQuery = `SELECT c.*, u.name AS user_name, cat.name AS category_name
+    FROM collections c
+    JOIN users u ON c.user_id = u.id
+    JOIN categories cat ON c.category_id = cat.id
+    `
+    db.query(getAllQuery, (err, data) => {
+        if (err) {
+            console.error('Database error: ', err)
+            return res.json('Error')
+        }
+        if (query.startsWith('#')) {
+            return res.json([])
+        }
+        return res.json(searchCollections(data, query))
     })
 })
 

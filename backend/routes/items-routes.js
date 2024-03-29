@@ -1,6 +1,7 @@
-const express = require('express');
-const router = express.Router();
-const db = require('../db/db');
+const express = require('express')
+const router = express.Router()
+const db = require('../db/db')
+const { searchItems, searchTags } = require('../helpers/search')
 
 const getCollItems = (req, res) => {
     const getCollItemsQuery = 'SELECT * FROM items WHERE collection_id = ?'
@@ -34,13 +35,43 @@ router.get('/getAll', (req, res) => {
     JOIN collections c ON i.collection_id = c.id
     ORDER BY i.id DESC
     `
-    //'SELECT * FROM items ORDER BY id DESC'
     db.query(getAllQuery, (err, data) => {
         if (err) {
             console.log('Database error: ', err)
             return res.json('Error')
         }
         return res.json(data)
+    })
+})
+
+router.post('/search', (req, res) => {
+    const { query } = req.body
+    const getAllQuery = `
+    SELECT 
+        i.*, 
+        u.name AS user_name, 
+        c.name AS collection_name,
+        GROUP_CONCAT(t.name) AS tags_names -- Concatenate tag names
+    FROM 
+        items i
+    JOIN 
+        users u ON i.user_id = u.id
+    JOIN 
+        collections c ON i.collection_id = c.id
+    LEFT JOIN 
+        tags t ON FIND_IN_SET(t.id, i.tags) -- Search for tag IDs within the comma-separated list
+    GROUP BY 
+        i.id
+    `
+    db.query(getAllQuery, (err, data) => {
+        if (err) {
+            console.log('Database error: ', err)
+            return res.json('Error')
+        }
+        if (query.startsWith('#')) {
+            return res.json(searchTags(data, query))
+        }
+        return res.json(searchItems(data, query))
     })
 })
 
