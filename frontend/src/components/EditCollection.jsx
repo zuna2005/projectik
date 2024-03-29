@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import {useDispatch, useSelector} from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import axios from 'axios'
 import New from '../assets/plus.svg'
 import Trash from '../assets/trash.svg'
@@ -19,6 +20,7 @@ const EditCollection = () => {
     const darkMode = useSelector(state => state.mode.darkMode)
     const dispatch = useDispatch()
     const navigate = useNavigate()
+    const [t, i18n] = useTranslation()
 
     const [custom, setCustom] = useState({
         'String': {'1': '', '2': '', '3': ''},
@@ -156,12 +158,12 @@ const EditCollection = () => {
   return (
     <div className={`d-flex flex-column align-items-center min-vh-100 ${darkMode ? 'text-bg-dark' : 'bg-light'}`}>
         <div className='d-flex flex-column w-75 mt-4'>
-            <h3>Edit Collection</h3>
+            <h3>{t('Edit Collection')}</h3>
             <form onSubmit={handleSubmit}>
                 <div className='container' data-bs-theme={darkMode && "dark"}>
                     <div className='row'>
                         <div className='col'>
-                            <label htmlFor="collection-name" className="form-label">Name</label>
+                            <label htmlFor="collection-name" className="form-label">{t('itemName')}</label>
                         </div>
                         <div className='col-6 w-75'>
                             <input 
@@ -169,14 +171,14 @@ const EditCollection = () => {
                                 className="form-control" 
                                 id="collection-name" 
                                 name='name' 
-                                placeholder="My Collection" 
+                                placeholder={t('myCollection')} 
                                 defaultValue={collection.name}
                                 required />
                         </div>
                     </div>   
                     <div className='row mt-3'>
                         <div className='col'>
-                            <label htmlFor="collection-description" className="form-label">Description</label>
+                            <label htmlFor="collection-description" className="form-label">{t('description')}</label>
                         </div>
                         <div className='col-6 w-75'>
                             <textarea 
@@ -184,14 +186,14 @@ const EditCollection = () => {
                                 id="collection-description" 
                                 name='description' 
                                 rows="3" 
-                                placeholder="My Collection Description"
+                                placeholder={t('myCollectionDescription')}
                                 defaultValue={collection.description} 
                                 required />
                         </div>
                     </div>
                     <div className='row mt-3'>
                         <div className='col'>
-                            <label htmlFor="category" className="form-label">Category</label>
+                            <label htmlFor="category" className="form-label">{t('category')}</label>
                         </div>
                         <div className='col-6 w-75'>
                         <select className="form-select" name="category" required>
@@ -208,7 +210,7 @@ const EditCollection = () => {
                             data-bs-toggle="dropdown" 
                             aria-expanded="false"
                             >
-                            <img src={darkMode ? NewDark : New} width={25} height={25}/> Add Custom Field for Items
+                            <img src={darkMode ? NewDark : New} width={25} height={25}/> {t('Add Custom Field for Items')}
                         </button>
                         <ul className="dropdown-menu">
                             {Object.keys(custom).map(val => {
@@ -218,7 +220,7 @@ const EditCollection = () => {
                                             onClick={(e) => handleCustomField(e, val)} 
                                             disabled={Object.keys(custom[val]).filter(ind => custom[val][ind] != '').length == 3}
                                             >
-                                            {val} Field ({3 - Object.keys(custom[val]).filter(ind => custom[val][ind] != '').length} left)
+                                            {t(`customFields.${val}`)} ({3 - Object.keys(custom[val]).filter(ind => custom[val][ind] != '').length} {t('left')})
                                         </button>
                                     </li>)
                             })}
@@ -226,7 +228,7 @@ const EditCollection = () => {
                     </div>
                     {newField != '' && <div className='row mt-3'>
                         <div className='col'>
-                            <label htmlFor='newField' className="form-label">{`${newField} Field name`}</label>
+                            <label htmlFor='newField' className="form-label">{t('itemName')}</label>
                         </div>
                         <div className='col-6 w-75'>
                             <div className='d-flex flex-row'>
@@ -235,11 +237,11 @@ const EditCollection = () => {
                                     className="form-control" 
                                     id="newField" 
                                     name="newField"
-                                    placeholder="Enter name of the custom field" 
+                                    placeholder={t("Enter name of the custom field")} 
                                     onChange={(e) => setNewFieldName(e.target.value)} 
                                     onKeyDown={handleKeyPress}
                                     required />
-                                <button className='btn btn-outline-success ms-3' onClick={handleSaveNewField}>Save</button>
+                                <button className='btn btn-outline-success ms-3' onClick={handleSaveNewField}>{t('buttons.save')}</button>
                             </div>
                         </div>
                     </div>}
@@ -250,7 +252,7 @@ const EditCollection = () => {
                             Object.keys(custom[val]).filter(key => custom[val][key] != '').map(key => {
                                 fields.push(<div className='row mt-3'>
                                         <div className='col'>
-                                            <label htmlFor={'id' + val + key} className="form-label">{`Field №${key} name`}</label>
+                                            <label htmlFor={'id' + val + key} className="form-label">{`${t('Name of Field')} №${key}`}</label>
                                         </div>
                                         <div className='col-6 w-75'>
                                             <div className='d-flex flex-row '>
@@ -263,7 +265,7 @@ const EditCollection = () => {
                                                     onChange={(e) => setEditFieldName(e.target.value)}
                                                     disabled={editField != val + key} />
                                                 {editField == val + key ?
-                                                <button className='btn btn-outline-success ms-3' onClick={(e) => handleSaveEditField(e, val, key)}>Save</button>
+                                                <button className='btn btn-outline-success ms-3' onClick={(e) => handleSaveEditField(e, val, key)}>{t('buttons.save')}</button>
                                                 : <div className='d-flex flex-row'>
                                                     <button className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'} ms-2`} onClick={() => setEditField(val + key)}>
                                                         <img src={darkMode ? EditDark : Edit} width={25} height={25}/>
@@ -285,15 +287,15 @@ const EditCollection = () => {
                             return fields
                         }
                         return <div className='mt-3' key={val}>
-                                {getFields() != '' && <h5>{val} Fields</h5>}
+                                {getFields() != '' && <h5>{t(`customFields.${val} Fields`)}</h5>}
                                 {getFields()}
                             </div>
                     })}
                     </div>
                 </div>
                 <div className='mt-4'>
-                    <button type='submit' className='btn btn-outline-success me-3'>Save</button>
-                    <Link to={`/collection-page/${coll_id}`} className='btn btn-outline-danger'>Cancel</Link>
+                    <button type='submit' className='btn btn-outline-success me-3'>{t('buttons.save')}</button>
+                    <Link to={`/collection-page/${coll_id}`} className='btn btn-outline-danger'>{t('buttons.cancel')}</Link>
                 </div>
         </form>
         </div>

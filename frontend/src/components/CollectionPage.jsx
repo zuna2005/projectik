@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { NavLink, useNavigate, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import axios from 'axios'
 import fetchItemsAndTags from '../helpers/fetchItemsAndTags'
 import updateUser from '../helpers/UpdateUser'
@@ -20,6 +21,7 @@ const CollectionPage = () => {
   const darkMode = useSelector(state => state.mode.darkMode)
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const [t, i18n] = useTranslation()
 
   const [collection, setCollection] = useState({})
   const [items, setItems] = useState([])
@@ -120,24 +122,24 @@ const CollectionPage = () => {
         <div className="text-center my-4 position-relative">
           <div className="position-absolute" style={{top: '0px', left: '0px'}}>
             <button className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'}`} onClick={() => navigate(-1)}>
-              <img src={darkMode ? BackDark : Back} width={25} height={25}/> Back
+              <img src={darkMode ? BackDark : Back} width={25} height={25}/> {t('buttons.back')}
             </button>
           </div>
-          <h3 className="w-100 text-center" style={{right: '50%'}}>Collection "{collection.name}"</h3>
+          <h3 className="w-100 text-center" style={{right: '50%'}}>{t('collection')} "{collection.name}"</h3>
           {(user.id === collection.user_id || user.admin == 1) &&
           <div className="position-absolute" style={{top: '0px', right: '0px'}}>
             <NavLink to='edit-collection' className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'} me-2`}>
-              <img src={darkMode ? EditDark : Edit} width={25} height={25}/> Edit
+              <img src={darkMode ? EditDark : Edit} width={25} height={25}/> {t('buttons.edit')}
             </NavLink>
             <button className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'}`} onClick={handleDeleteCollection}>
-              <img src={darkMode ? TrashDark : Trash} width={25} height={25}/> Delete
+              <img src={darkMode ? TrashDark : Trash} width={25} height={25}/> {t('buttons.delete')}
             </button>
           </div>}
         </div>
         <div className='container'>
           <div className='row'>
             <div className='col'>
-              <h5>Description:</h5>
+              <h5>{t('description')}:</h5>
             </div>
             <div className='col-6 w-75'>
               <h4 className='lead ms-3'>{collection.description}</h4>
@@ -145,7 +147,7 @@ const CollectionPage = () => {
           </div>
           <div className='row mt-3'>
             <div className='col'>
-              <h5>Category:</h5>
+              <h5>{t('category')}:</h5>
             </div>
             <div className='col-6 w-75'>
               <h4 className='lead ms-3'>{collection.category}</h4>
@@ -153,7 +155,7 @@ const CollectionPage = () => {
           </div>
           <div className='row mt-3'>
             <div className='col'>
-              <h5>Author:</h5>
+              <h5>{t('author')}:</h5>
             </div>
             <div className='col-6 w-75'>
               <h4 
@@ -168,15 +170,15 @@ const CollectionPage = () => {
         </div>
         <hr />
         <div className='d-flex justify-content-center'>
-          <h4>Items</h4>
+          <h4>{t('items')}</h4>
         </div>
         {(user.id === collection.user_id || user.admin == 1) &&
         <div className='d-flex justify-content-between'>
           <NavLink to='new-item' className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'} me-2`}>
-          <img src={darkMode ? NewDark : New} width={25} height={25}/> New
+          <img src={darkMode ? NewDark : New} width={25} height={25}/> {t('buttons.new')}
           </NavLink>
           <button className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'}`} onClick={handleDeleteItems}>
-          <img src={darkMode ? TrashDark : Trash} width={25} height={25}/> Delete
+          <img src={darkMode ? TrashDark : Trash} width={25} height={25}/> {t('buttons.delete')}
           </button>
         </div>}
         <table className='table table-hover mt-2'>
@@ -190,9 +192,9 @@ const CollectionPage = () => {
                   checked={allChecked} 
                   onChange={handleCheckboxChangeAll}/>
               </th>}
-              <th>id</th>
-              <th>name</th>
-              <th>tags</th>
+              <th>Id</th>
+              <th>{t('itemName')}</th>
+              <th>{t('tags')}</th>
               {Object.keys(collection).filter(val => val.includes('state') && collection[val] == 1 && !val.includes('text')).map(val => {
                 let fieldName = val.slice(0, val.indexOf('state')) + 'name'
                 return (
@@ -220,7 +222,7 @@ const CollectionPage = () => {
                   {Object.keys(item).filter(val => val.includes('state') && item[val] == 1 && !val.includes('text')).map(val => {
                     let fieldName = val.slice(0, val.indexOf('state')) + 'value'
                     return (
-                      <td>{item[fieldName] || '-'}</td>
+                      <td>{fieldName.includes('checkbox') ? (item[fieldName] == 1 ? t('yes') : t('no')) : (item[fieldName] || '-')}</td>
                     )
                   })}
               </tr>)

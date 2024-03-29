@@ -1,10 +1,12 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { NavLink } from 'react-router-dom'
 
 const Tabs = () => {
   const darkMode = useSelector(state => state.mode.darkMode)
-  const names = ['Latest Items', 'Largest Collections', 'Tag Cloud']
+  const [t, i18n] = useTranslation()
+  const names = [t('latestItems'), t('largestCollections'), t('tagCloud')]
   const links = ['/', 'largest-collections', 'tag-cloud']
   return (
     <div>

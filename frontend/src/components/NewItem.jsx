@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import {useDispatch, useSelector} from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import CreatableSelect from 'react-select/creatable'
 import axios from 'axios'
 import updateUser from '../helpers/UpdateUser'
@@ -12,6 +13,7 @@ const NewItem = () => {
     const navigate = useNavigate()
     const dispatch = useDispatch()
     let { coll_id } = useParams()
+    const [t, i18n] = useTranslation()
     const [collection, setCollection] = useState({})
     const [selectedTags, setSelectedTags] = useState([])
     const [options, setOptions] = useState([])
@@ -112,7 +114,7 @@ const NewItem = () => {
           backgroundColor: isSelected ? '#555' : '#212529',
           color: isSelected ? '#adb5bd' : '#ccc',
           ':hover': {
-            backgroundColor: '#6c757d', // Change to the desired hover color
+            backgroundColor: '#6c757d',
           }
         }),
         multiValue: (styles) => ({
@@ -124,20 +126,20 @@ const NewItem = () => {
   return (
     <div className={`d-flex flex-column align-items-center min-vh-100 ${darkMode ? 'text-bg-dark' : 'bg-light'}`} data-bs-theme={darkMode && "dark"}>
         <div className='d-flex flex-column w-75 mt-4'>
-            <h3>New Item</h3>
+            <h3>{t('New Item')}</h3>
             <form onSubmit={handleSubmit}>
                 <div className='container'>
                     <div className='row'>
                         <div className='col'>
-                            <label htmlFor="item-name" className="form-label">Name</label>
+                            <label htmlFor="item-name" className="form-label">{t('itemName')}</label>
                         </div>
                         <div className='col-6 w-75'>
-                            <input type="text" className="form-control" id="item-name" name='name' placeholder="My Item" required />
+                            <input type="text" className="form-control" id="item-name" name='name' placeholder={t("My Item")} required />
                         </div>
                     </div>
                     <div className='row mt-3'>
                         <div className='col'>
-                            <label htmlFor="tags" className="form-label">Tags</label>
+                            <label htmlFor="tags" className="form-label">{t('tags')}</label>
                         </div>
                         <div className='col-6 w-75'>
                             <CreatableSelect 
@@ -145,26 +147,27 @@ const NewItem = () => {
                                 options={options} 
                                 onChange={handleTagChange} 
                                 styles={darkMode ? darkTheme : {}}
+                                placeholder={t('select')}
                                 required/>
                         </div>
                     </div>
                     {Object.keys(collection).filter(val => val.includes('state') && collection[val] == 1).length > 0 &&
                     <div>
                         <hr />
-                        <h5>Custom Fields</h5>
+                        <h5>{t('Custom Fields')}</h5>
                     </div>}
                     {Object.keys(collection).filter(val => val.includes('state') && collection[val] == 1).map(val => {
                         const field = val.slice(0, val.indexOf('state'))
                         const fieldName = field + 'name'
                         const fieldType = () => {
                             if (val.includes('string')) {
-                                return <input type="text" className="form-control" name={field} placeholder="String value" />
+                                return <input type="text" className="form-control" name={field} placeholder={t("customFields.String value")} />
                             }
                             if (val.includes('int')) {
-                                return <input type="number" className="form-control" name={field} placeholder="Integer value" />
+                                return <input type="number" className="form-control" name={field} placeholder={t("customFields.Integer value")} />
                             }
                             if (val.includes('text')) {
-                                return <textarea className="form-control" name={field} placeholder="Text value" />
+                                return <textarea className="form-control" name={field} placeholder={t("customFields.Text value")} />
                             }
                             if (val.includes('checkbox')) {
                                 return <input type="checkbox" className="form-check-input" name={field} onChange={handleCheckboxChange}/>
@@ -185,8 +188,8 @@ const NewItem = () => {
                         )
                     })}
                 <div className='mt-4'>
-                    <button type='submit' className='btn btn-outline-success me-3'>Create</button>
-                    <Link to={`/collection-page/${coll_id}`} className='btn btn-outline-danger'>Cancel</Link>
+                    <button type='submit' className='btn btn-outline-success me-3'>{t('buttons.create')}</button>
+                    <Link to={`/collection-page/${coll_id}`} className='btn btn-outline-danger'>{t('buttons.cancel')}</Link>
                 </div>
                 </div>
         </form>

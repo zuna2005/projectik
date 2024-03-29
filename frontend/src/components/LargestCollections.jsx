@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 
 const LargestCollections = () => {
   const darkMode = useSelector(state => state.mode.darkMode)
   const navigate = useNavigate()
+  const [t, i18n] = useTranslation()
   const [data, setData] = useState([])
   const fetchData = () => {
     axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/collections/top5`)
@@ -27,16 +29,16 @@ const LargestCollections = () => {
   return (
     <div className={`d-flex flex-column align-items-center min-vh-100 ${darkMode ? 'text-bg-dark' : 'bg-light'}`} data-bs-theme={darkMode && "dark"}>
       <div className='d-flex flex-column w-75'>
-        <h3 className='text-center my-3'>Largest Collections</h3>
+        <h3 className='text-center my-3'>{t('largestCollections')}</h3>
         <table className='table table-hover'>
           <thead>
             <tr>
               <th>#</th>
-              <th>Name</th>
-              <th>Description</th>
-              <th>Author</th>
-              <th>Category</th>
-              <th>Items</th>
+              <th>{t('itemName')}</th>
+              <th>{t('description')}</th>
+              <th>{t('author')}</th>
+              <th>{t('category')}</th>
+              <th>{t('items')}</th>
             </tr>
           </thead>
           <tbody>
@@ -47,7 +49,7 @@ const LargestCollections = () => {
                   <td>{val.name}</td>
                   <td>{val.description}</td>
                   <td>{val.user_name}</td>
-                  <td>{val.category_name}</td>
+                  <td>{t(`categories.${val.category_name}`)}</td>
                   <td>{val.items_count}</td>
               </tr>)
             })}

@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 
 const TagCloud = () => {
   const darkMode = useSelector(state => state.mode.darkMode)
   const [tags, setTags] = useState([])
+  const [t, i18n] = useTranslation()
   const navigate = useNavigate()
   useEffect(() =>{
     axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/tags/allTags`)
@@ -18,7 +20,7 @@ const TagCloud = () => {
   return (
     <div className={`d-flex flex-column align-items-center min-vh-100 ${darkMode ? 'text-bg-dark' : 'bg-light'}`}>
       <div className='d-flex flex-column w-75'>
-        <h3 className='text-center mt-3'>Tag Cloud</h3>
+        <h3 className='text-center mt-3'>{t('tagCloud')}</h3>
         <div className='d-flex flex-wrap'>
           {tags.map(tag => {
             return <button 

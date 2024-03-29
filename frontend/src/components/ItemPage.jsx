@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { NavLink, useNavigate, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import axios from 'axios'
 import fetchItemsAndTags from '../helpers/fetchItemsAndTags'
 import updateUser from '../helpers/UpdateUser'
@@ -17,6 +18,7 @@ import HeartFill from '../assets/heart-fill.svg'
 
 const ItemPage = () => {
   const { item_id } = useParams()
+  const [t, i18n] = useTranslation()
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const user = useSelector(state => state.login.currentUser)
@@ -84,17 +86,17 @@ const ItemPage = () => {
         <div className="text-center my-4 position-relative">
           <div className="position-absolute" style={{top: '0px', left: '0px'}}>
             <button className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'}`} onClick={() => navigate(-1)}>
-              <img src={darkMode ? BackDark : Back} width={25} height={25}/> Back
+              <img src={darkMode ? BackDark : Back} width={25} height={25}/> {t('buttons.back')}
             </button>
           </div>
-          <h3 className="w-100 text-center" style={{right: '50%'}}>Item "{item.name}"</h3>
+          <h3 className="w-100 text-center" style={{right: '50%'}}>{t('item')} "{item.name}"</h3>
           {(user.id === item.user_id || user.admin == 1) &&
           <div className="position-absolute" style={{top: '0px', right: '0px'}}>
             <NavLink to='edit-item' className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'} me-2`}>
-              <img src={darkMode ? EditDark : Edit} width={25} height={25}/> Edit
+              <img src={darkMode ? EditDark : Edit} width={25} height={25}/> {t('buttons.edit')}
             </NavLink>
             <button className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'}`} onClick={handleDelete}>
-              <img src={darkMode ? TrashDark : Trash} width={25} height={25}/> Delete
+              <img src={darkMode ? TrashDark : Trash} width={25} height={25}/> {t('buttons.delete')}
             </button>
           </div>}
         </div>
@@ -102,9 +104,9 @@ const ItemPage = () => {
           <div className='row'>
             <div className='col-6 w-75'>
               <h6 className={`text-body-${darkMode ? 'light' : 'secondary'}`}>#id {item.id}</h6>
-              <h5><span className='lead'>of collection </span>"<u style={{ cursor: 'pointer' }} onClick={() => navigate(`/collection-page/${collection.id}`)}>{collection.name}</u>"</h5>
-              <h5><span className='lead'>by </span>"<u style={{ cursor: 'pointer' }} onClick={() => navigate(`/user-page/${item.user_id}`)}>{collection.user_name}</u>"</h5>
-              <h5 className={`text-body-${darkMode ? 'light' : 'secondary'}`}>Likes: {item.likes ? item.likes.split(',').length : 0} 
+              <h5><span className='lead'>{t('fromCollection')} </span>"<u style={{ cursor: 'pointer' }} onClick={() => navigate(`/collection-page/${collection.id}`)}>{collection.name}</u>"</h5>
+              <h5><span className='lead'>{t('by')} </span>"<u style={{ cursor: 'pointer' }} onClick={() => navigate(`/user-page/${item.user_id}`)}>{collection.user_name}</u>"</h5>
+              <h5 className={`text-body-${darkMode ? 'light' : 'secondary'}`}>{t('likes')}: {item.likes ? item.likes.split(',').length : 0} 
                 {user.status == 'Active' && 
                 <button className='btn' onClick={handleLike}>{liked ? 
                   <img src={HeartFill} width={25} height={25}/> :
@@ -120,14 +122,14 @@ const ItemPage = () => {
                           <h5>{collection[field + 'name']}:</h5>
                         </div>
                         <div className='col'>
-                          <h5 className='lead'>{item[field + 'value'] || '-'}</h5>
+                          <h5 className='lead'>{field.includes('checkbox') ? (item[field + 'value'] == 1 ? t('yes') : t('no')) : (item[field + 'value'] || '-')}</h5>
                         </div>
                       </div>
                     )
                   })}
             </div>
             <div className='col border-start'>
-              <h4>Tags:</h4>
+              <h4>{t('tags')}:</h4>
               {item.tags && item.tags.split(', ').map(tag => {
                 return (
                   <button 
@@ -142,7 +144,7 @@ const ItemPage = () => {
           </div>
         </div>
         <hr />
-        <h4 >Comments</h4>
+        <h4 >{t('comments')}</h4>
       </div>
     </div>
   )

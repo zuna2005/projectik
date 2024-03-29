@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import {useDispatch, useSelector} from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import axios from 'axios'
 import ValidateLogin from '../helpers/LoginValidation'
 import FormField from './FormField'
@@ -8,6 +9,7 @@ import {setUser} from "../features/loginSlice"
 const Form = ({heading}) => {
     const dispatch = useDispatch()
     const user = useSelector(state => state.login.currentUser)
+    const [t, i18n] = useTranslation()
 
     let messageText = ''
     if (user.status === 'Blocked') {
@@ -34,7 +36,7 @@ const Form = ({heading}) => {
         event.preventDefault()
         let errorsTemp = ValidateLogin(values)
         setErrors(errorsTemp)
-        if (heading === 'Sign up' && Object.values(errorsTemp).every(value => value === '')) {
+        if (heading === t('signUp') && Object.values(errorsTemp).every(value => value === '')) {
             axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/users/signup`, values)
             .then(res => {
                 console.log(res)
@@ -48,7 +50,7 @@ const Form = ({heading}) => {
             })
             .catch(err => console.log(err))
         }
-        else if (heading === 'Login' && Object.values(errorsTemp).slice(1).every(value => value === '')) {
+        else if (heading === t('login') && Object.values(errorsTemp).slice(1).every(value => value === '')) {
             axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/users/login`, values)
             .then(res => {
                 console.log(res.data)
@@ -76,7 +78,7 @@ const Form = ({heading}) => {
         }
     }
   return (
-    <div className="modal fade" id={heading === 'Login' ? 'loginModal' : 'signupModal'} tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div className="modal fade" id={heading === t('login') ? 'loginModal' : 'signupModal'} tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div className="modal-dialog modal-dialog-centered">
           <div className="modal-content">
             <div className="modal-header">
@@ -86,7 +88,7 @@ const Form = ({heading}) => {
             <div className="modal-body">
             {message.text && <div className={`alert alert-${message.type}`} role="alert">{message.text}</div>}
                 <form>
-                    {heading === 'Sign up' && 
+                    {heading === t('signUp') && 
                     <FormField name='name' onChange={handleInput} errors={errors} heading={heading}/>}
                     <FormField name='email' onChange={handleInput} errors={errors} heading={heading}/>
                     <FormField name='password' onChange={handleInput} errors={errors} heading={heading}/>
@@ -94,8 +96,8 @@ const Form = ({heading}) => {
                 <div className="d-flex justify-content-between">
                         <button type='submit' className='btn btn-success' onClick={handleSubmit}>{heading}</button>
                         <button className='btn btn-secondary'
-                            data-bs-target={heading === 'Login' ? '#signupModal' : '#loginModal'} data-bs-toggle="modal">
-                            {heading === 'Login' ? 'Sign up' : 'Login'}
+                            data-bs-target={heading === t('login') ? '#signupModal' : '#loginModal'} data-bs-toggle="modal">
+                            {heading === t('login') ? t('signUp') : t('login')}
                         </button>
                     </div>
             </div>

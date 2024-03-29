@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import {useDispatch, useSelector} from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import { setUser } from '../features/loginSlice'
 import axios from 'axios'
 import Lock from '../assets/lock.svg'
@@ -15,6 +16,7 @@ const Admin = () => {
     const navigate = useNavigate()
     const user = useSelector(state => state.login.currentUser)
     const darkMode = useSelector(state => state.mode.darkMode)
+    const [t, i18n] = useTranslation()
     const [data, setData] = useState([])
     useEffect(() =>{
         axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/users/all`)
@@ -67,25 +69,25 @@ const Admin = () => {
   return (
     <div className={`d-flex flex-column align-items-center min-vh-100 ${darkMode ? 'text-bg-dark' : 'bg-light'}`} data-bs-theme={darkMode && "dark"}>
       <div className='d-flex flex-column w-75'>
-        <h3 className='text-center mt-3'>Admin Panel</h3>
+        <h3 className='text-center mt-3'>{t('adminPanel')}</h3>
         <div className='d-flex justify-content-between'>
             <div>
                 <button className='btn btn-outline-danger' onClick={() => handleChange('Blocked')}>
-                    <img src={Lock} width={25} height={25}/> Block
+                    <img src={Lock} width={25} height={25}/> {t('buttons.block')}
                 </button>
                 <button className='btn btn-outline-success ms-2' onClick={() => handleChange('Active')}>
-                    <img src={Unlock} width={25} height={25}/> Unblock
+                    <img src={Unlock} width={25} height={25}/> {t('buttons.unblock')}
                 </button>
                 <button className={`btn btn-outline-${darkMode ? 'light' : 'dark'} ms-2`} onClick={() => handleChange('delete')}>
-                    <img src={darkMode ? TrashDark : Trash} width={25} height={25}/> Delete
+                    <img src={darkMode ? TrashDark : Trash} width={25} height={25}/> {t('buttons.delete')}
                 </button>
             </div>
             <div>
                 <button className='btn btn-outline-danger' onClick={() => handleChange(false)}>
-                    <img src={UserBlock} width={25} height={25}/> Delete Admin
+                    <img src={UserBlock} width={25} height={25}/> {t('buttons.deleteAdmin')}
                 </button>
                 <button className='btn btn-outline-success ms-2' onClick={() => handleChange(true)}>
-                    <img src={UserAdd} width={25} height={25}/> Add Admin
+                    <img src={UserAdd} width={25} height={25}/> {t('buttons.addAdmin')}
                 </button>
             </div>
         </div>
@@ -96,10 +98,10 @@ const Admin = () => {
                 <input className="form-check-input" type="checkbox" checked={allChecked} onChange={handleCheckboxChangeAll}/>
               </th>
               <th>Id</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Status</th>
-              <th>Admin</th>
+              <th>{t('name').charAt(0).toUpperCase() + t('name').slice(1)}</th>
+              <th>{t('email').charAt(0).toUpperCase() + t('email').slice(1)}</th>
+              <th>{t('status')}</th>
+              <th>{t('admin')}</th>
             </tr>
           </thead>
           <tbody>

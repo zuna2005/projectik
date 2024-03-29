@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { NavLink, useNavigate, useParams } from 'react-router-dom'
 import {useDispatch, useSelector} from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import axios from 'axios'
 import updateUser from '../helpers/UpdateUser'
 import { setUser } from "../features/loginSlice"
@@ -15,6 +16,7 @@ const MyPage = () => {
   const { user_id } = useParams()
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const [t, i18n] = useTranslation()
   const [author, setAuthor] = useState('')
   const [data, setData] = useState([])
   useEffect(() =>{
@@ -92,14 +94,14 @@ const MyPage = () => {
     <div className={`d-flex flex-column align-items-center min-vh-100 ${darkMode ? 'text-bg-dark' : 'bg-light'}`} data-bs-theme={darkMode && "dark"}>
       <div className='d-flex flex-column w-75'>
         <div className='d-flex justify-content-between my-4'>
-        <h3>Collections of {author.name}</h3>
+        <h3>{t('collectionsOf')} "{author.name}" {user.id == user_id && `(${t('you')})`}</h3>
           {(user.id == user_id || user.admin == 1) &&
             <div>
             <NavLink to='new-collection' className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'} me-2`}>
-            <img src={darkMode ? NewDark : New} width={25} height={25}/> New
+            <img src={darkMode ? NewDark : New} width={25} height={25}/> {t('buttons.new')}
             </NavLink>
             <button className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'}`} onClick={handleDelete}>
-            <img src={darkMode? TrashDark : Trash} width={25} height={25}/> Delete
+            <img src={darkMode? TrashDark : Trash} width={25} height={25}/> {t('buttons.delete')}
             </button>
           </div>}
         </div>
@@ -110,10 +112,10 @@ const MyPage = () => {
               <th >
                 <input className="form-check-input" type="checkbox" checked={allChecked} onChange={handleCheckboxChangeAll}/>
               </th>}
-              <th>Name</th>
-              <th>Description</th>
-              <th>Category</th>
-              <th>Items</th>
+              <th>{t('itemName')}</th>
+              <th>{t('description')}</th>
+              <th>{t('category')}</th>
+              <th>{t('items')}</th>
             </tr>
           </thead>
           <tbody>
@@ -132,7 +134,7 @@ const MyPage = () => {
                   </td>}
                   <td>{val.collection_name}</td>
                   <td>{val.description}</td>
-                  <td>{val.category_name}</td>
+                  <td>{t(`categories.${val.category_name}`)}</td>
                   <td>{val.items_count}</td>
               </tr>)
             })}

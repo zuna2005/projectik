@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import {useDispatch, useSelector} from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import Person from '../assets/person.svg'
 import PersonDark from '../assets/person-dark.svg'
 import Admin from '../assets/admin.svg'
@@ -15,13 +16,15 @@ import Cloud from '../assets/cloud.svg'
 import CloudDark from '../assets/cloud-dark.svg'
 import { setUser } from '../features/loginSlice'
 import { setMode } from '../features/modeSlice'
-import Sample from './Sample'
+import Login from './Login'
 
 const NavBar = () => {
     const dispatch = useDispatch()
     const user = useSelector(state => state.login.currentUser)
     const darkMode = useSelector(state => state.mode.darkMode)
     const navigate = useNavigate()
+    const [t, i18n] = useTranslation()
+    const [lng, setLng] = useState('en')
     const [search, setSearch] = useState('')
     const handleSearch = (e) => {
         e.preventDefault()
@@ -29,8 +32,12 @@ const NavBar = () => {
         setSearch('')
     }
     const handleMode = () => {
-        console.log('darkMode after click', !darkMode)
         dispatch(setMode(!darkMode))
+    }
+    const handleLang = () => {
+        const newLng = lng == 'en' ? 'ru': 'en'
+        setLng(newLng)
+        i18n.changeLanguage(newLng)
     }
     const handleLogout = () => {
         dispatch(setUser({status: ''}))
@@ -42,20 +49,20 @@ const NavBar = () => {
             <div className="position-absolute" style={{top: '0px', left: '0px'}}>
                 {user.status == 'Active' ?
                 <NavLink to={`user-page/${user.id}`} type='button' className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'}`}>
-                    <img src={darkMode ? PersonDark : Person} width={25} height={25}/> My Page
+                    <img src={darkMode ? PersonDark : Person} width={25} height={25}/> {t('myPage')}
                 </NavLink> :
-                <h3>Collection Cloud <img src={darkMode ? CloudDark : Cloud} width={30} height={30}/></h3>}
+                <h3>{t('collectionCloud')} <img src={darkMode ? CloudDark : Cloud} width={30} height={30}/></h3>}
                 {user.admin == 1 &&
                 <NavLink to='admin' type='button' className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'} ms-3`}>
-                    <img src={darkMode ? AdminDark : Admin} width={25} height={25}/> Admin Panel
+                    <img src={darkMode ? AdminDark : Admin} width={25} height={25}/> {t('adminPanel')}
                 </NavLink>}
             </div>
             <form className="d-flex justify-content-center">
-                <div className="input-group w-50">
+                <div className="input-group w-25">
                     <input 
                         className="form-control" 
                         type="search" 
-                        placeholder="Search" 
+                        placeholder={t('search')} 
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         onBlur={() => setSearch('')} />
@@ -69,17 +76,25 @@ const NavBar = () => {
             <button className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'} rounded-5 me-3`} onClick={handleMode} >
                 <img src={darkMode ? Light : Dark} width={25} height={25} />
             </button>
-            <button className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'} rounded-5 me-5`} >
+            <button className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'} rounded-5 me-5`} data-bs-toggle="dropdown" aria-expanded="false">
                 <img src={darkMode ? LanguageDark : Language} width={25} height={25} />
             </button>
+            <ul className="dropdown-menu">
+                <li>
+                    <button className="dropdown-item" onClick={() => i18n.changeLanguage('en')}>en</button>
+                </li>
+                <li>
+                    <button className="dropdown-item" onClick={() => i18n.changeLanguage('ru')}>ru</button>
+                </li>
+            </ul>
             {user.status === 'Active' ? 
-            <button className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'}`} onClick={handleLogout}>Logout</button> :
-            <button className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'}`} data-bs-toggle="modal" data-bs-target="#loginModal">Login</button>
+            <button className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'}`} onClick={handleLogout}>{t('logout')}</button> :
+            <button className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'}`} data-bs-toggle="modal" data-bs-target="#loginModal">{t('login')}</button>
             }
           </div>
         </div>
-        <Sample heading='Login'/>
-        <Sample heading='Sign up'/>
+        <Login heading={t('login')}/>
+        <Login heading={t('signUp')}/>
     </div>
     </div>
   )
