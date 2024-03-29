@@ -114,6 +114,7 @@ const Admin = () => {
                     name={val.id}
                     checked={checkedItems[val.id]}
                     onChange={handleCheckboxChange}
+                    onClick={(e) => e.stopPropagation()}
                   />
                   </td>
                   <td>{val.id}</td>

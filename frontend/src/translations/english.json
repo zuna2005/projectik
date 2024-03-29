@@ -50,6 +50,11 @@
   "collectionBy": "by",
   "Nothing found": "Nothing found",
   "Try searching something else": "Try searching something else",
+  "blockedMessage": "Your account has been blocked. You can no longer login to the system.",
+  "deletedMessage": "Your account has been deleted. You can re-register if you want.",
+  "emailExistsMessage": "User with this email already exists. Maybe try login?",
+  "incorrectPassword": "Incorrect password",
+  "userNotFound": "User not found",
   "deleteModal": {
     "title": "Custom Field Deletion",
     "confirmation": "Are you sure you want to delete the custom field? It will permanently remove all of the content of that field in all items of the collection."

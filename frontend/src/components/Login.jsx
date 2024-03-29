@@ -11,15 +11,8 @@ const Form = ({heading}) => {
     const user = useSelector(state => state.login.currentUser)
     const [t, i18n] = useTranslation()
 
-    let messageText = ''
-    if (user.status === 'Blocked') {
-        messageText = "You're blocked and can no longer log into the system"
-    }
-    else if (user.status === 'Deleted') {
-        messageText = "You were deleted from the system. You can re-register if you wish to"
-    }
     const [message, setMessage] = useState({
-        text: messageText,
+        text: '',
         type: 'danger'
     })
     const [values, setValues] = useState({
@@ -41,11 +34,12 @@ const Form = ({heading}) => {
             .then(res => {
                 console.log(res)
                 if (res.data === 'Email exists') {
-                    setMessage(prev => ({...prev, text:'User with this email already exists. Maybe try login?'}))
+                    setMessage(prev => ({...prev, text: t('emailExistsMessage')}))
                 } else {
                     dispatch(setUser({...res.data}))
                     document.getElementById('signupModal').classList.remove('show')
-                    document.getElementsByClassName('modal-backdrop')[0].remove();
+                    document.getElementsByClassName('modal-backdrop')[0].remove()
+                    setMessage(prev => ({...prev, text:""}))
                 }
             })
             .catch(err => console.log(err))
@@ -55,21 +49,22 @@ const Form = ({heading}) => {
             .then(res => {
                 console.log(res.data)
                 if (res.data.status === 'Blocked') {
-                    setMessage(prev => ({...prev, text:"You're blocked and can no longer log into the system"}))
+                    setMessage(prev => ({...prev, text:t('blockedMessage')}))
                 }
                 else {
                     dispatch(setUser({...res.data}))
                     document.getElementById('loginModal').classList.remove('show')
                     document.getElementsByClassName('modal-backdrop')[0].remove()
+                    setMessage(prev => ({...prev, text:""}))
                 }               
                 
             })
             .catch(err => {
                 console.log(err);
                 if (err.response.data === 'Incorrect password') {
-                    setMessage(prev => ({...prev, text: err.response.data}))
+                    setMessage(prev => ({...prev, text: t('incorrectPassword')}))
                 } else if (err.response.data === 'Incorrect email') {
-                    setMessage(prev => ({...prev, text:'User not found'}))
+                    setMessage(prev => ({...prev, text: t('userNotFound')}))
                 }
             })
         }
@@ -83,23 +78,27 @@ const Form = ({heading}) => {
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title" id="exampleModalLabel">{heading}</h5>
-              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={() => setMessage(prev => ({...prev, text:""}))} />
             </div>
             <div className="modal-body">
             {message.text && <div className={`alert alert-${message.type}`} role="alert">{message.text}</div>}
-                <form>
+                <form onSubmit={handleSubmit}>
                     {heading === t('signUp') && 
                     <FormField name='name' onChange={handleInput} errors={errors} heading={heading}/>}
                     <FormField name='email' onChange={handleInput} errors={errors} heading={heading}/>
                     <FormField name='password' onChange={handleInput} errors={errors} heading={heading}/>
-                </form>
-                <div className="d-flex justify-content-between">
-                        <button type='submit' className='btn btn-success' onClick={handleSubmit}>{heading}</button>
-                        <button className='btn btn-secondary'
-                            data-bs-target={heading === t('login') ? '#signupModal' : '#loginModal'} data-bs-toggle="modal">
+                    <div className="d-flex justify-content-between">
+                        <button type='submit' className='btn btn-success'>{heading}</button>
+                        <button 
+                            className='btn btn-secondary'
+                            data-bs-target={heading === t('login') ? '#signupModal' : '#loginModal'} 
+                            data-bs-toggle="modal"
+                            onClick={(e) => {e.preventDefault(); setMessage(prev => ({...prev, text:""}))}}
+                            >
                             {heading === t('login') ? t('signUp') : t('login')}
                         </button>
                     </div>
+                </form>
             </div>
           </div>
         </div>

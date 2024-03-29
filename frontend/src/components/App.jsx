@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import { setUser } from "../features/loginSlice"
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
@@ -22,12 +23,13 @@ import Search from './Search'
 function App() {
   const user = useSelector(state => state.login.currentUser)
   const dispatch = useDispatch()
+  const [t, i18n] = useTranslation()
   useEffect(() => {
     if (user.status === 'Blocked') {
-      toast.error('Your account has been blocked.')
+      toast.error(t('blockedMessage'))
       dispatch(setUser({status: ''}))
     } else if (user.status === 'Deleted') {
-      toast.error('Your account has been deleted. You can re-register if you want.')
+      toast.error(t('deletedMessage'))
       dispatch(setUser({status: ''}))
     }
   }, [user])
