@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import { useSelector } from 'react-redux'
 
 const LargestCollections = () => {
+  const darkMode = useSelector(state => state.mode.darkMode)
   const navigate = useNavigate()
   const [data, setData] = useState([])
   const fetchData = () => {
@@ -23,10 +25,10 @@ const LargestCollections = () => {
     navigate(`/collection-page/${coll_id}`)
   }
   return (
-    <div className='d-flex flex-column align-items-center'>
+    <div className={`d-flex flex-column align-items-center min-vh-100 ${darkMode ? 'text-bg-dark' : 'bg-light'}`} data-bs-theme={darkMode && "dark"}>
       <div className='d-flex flex-column w-75'>
-        <h3 className='text-center mt-3'>Largest Collections</h3>
-        <table className="table table-hover">
+        <h3 className='text-center my-3'>Largest Collections</h3>
+        <table className='table table-hover'>
           <thead>
             <tr>
               <th>#</th>

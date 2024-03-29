@@ -5,10 +5,13 @@ import axios from 'axios'
 import updateUser from '../helpers/UpdateUser'
 import { setUser } from "../features/loginSlice"
 import New from '../assets/plus.svg'
+import NewDark from '../assets/plus-dark.svg'
 import Trash from '../assets/trash.svg'
+import TrashDark from '../assets/trash-dark.svg'
 
 const MyPage = () => {
   const user = useSelector(state => state.login.currentUser)
+  const darkMode = useSelector(state => state.mode.darkMode)
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const [data, setData] = useState([])
@@ -82,20 +85,20 @@ const MyPage = () => {
     navigate(`/collection-page/${coll_id}`)
   }
   return (
-    <div className='d-flex flex-column align-items-center'>
+    <div className={`d-flex flex-column align-items-center min-vh-100 ${darkMode ? 'text-bg-dark' : 'bg-light'}`} data-bs-theme={darkMode && "dark"}>
       <div className='d-flex flex-column w-75'>
         <div className='d-flex justify-content-between my-4'>
         <h3>My Collections</h3>
           <div>
-            <NavLink to='new-collection' className='btn btn-outline-dark me-2'>
-            <img src={New} width={25} height={25}/> New
+            <NavLink to='new-collection' className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'} me-2`}>
+            <img src={darkMode ? NewDark : New} width={25} height={25}/> New
             </NavLink>
-            <button className='btn btn-outline-dark' onClick={handleDelete}>
-            <img src={Trash} width={25} height={25}/> Delete
+            <button className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'}`} onClick={handleDelete}>
+            <img src={darkMode? TrashDark : Trash} width={25} height={25}/> Delete
             </button>
           </div>
         </div>
-        <table className="table table-hover">
+        <table className='table table-hover'>
           <thead>
             <tr>
               <th >

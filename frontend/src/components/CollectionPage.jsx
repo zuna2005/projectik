@@ -9,10 +9,15 @@ import New from '../assets/plus.svg'
 import Trash from '../assets/trash.svg'
 import Edit from '../assets/edit.svg'
 import Back from '../assets/arrow-left.svg'
+import NewDark from '../assets/plus-dark.svg'
+import TrashDark from '../assets/trash-dark.svg'
+import EditDark from '../assets/edit-dark.svg'
+import BackDark from '../assets/arrow-left-dark.svg'
 
 const CollectionPage = () => {
   let { coll_id } = useParams()
   const user = useSelector(state => state.login.currentUser)
+  const darkMode = useSelector(state => state.mode.darkMode)
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
@@ -110,22 +115,22 @@ const CollectionPage = () => {
     navigate(`/item-page/${item_id}`)
   }
   return (
-    <div className='d-flex flex-column align-items-center'>
+    <div className={`d-flex flex-column align-items-center min-vh-100 ${darkMode ? 'text-bg-dark' : 'bg-light'}`} data-bs-theme={darkMode && "dark"}>
       <div className='d-flex flex-column w-75'>
         <div className="text-center my-4 position-relative">
           <div className="position-absolute" style={{top: '0px', left: '0px'}}>
-            <button className='btn btn-outline-dark me-2' onClick={() => navigate(-1)}>
-              <img src={Back} width={25} height={25}/> Back
+            <button className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'}`} onClick={() => navigate(-1)}>
+              <img src={darkMode ? BackDark : Back} width={25} height={25}/> Back
             </button>
           </div>
           <h3 className="w-100 text-center" style={{right: '50%'}}>Collection "{collection.name}"</h3>
           {user.id === collection.user_id &&
           <div className="position-absolute" style={{top: '0px', right: '0px'}}>
-            <NavLink to='edit-collection' className='btn btn-outline-dark me-2'>
-              <img src={Edit} width={25} height={25}/> Edit
+            <NavLink to='edit-collection' className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'} me-2`}>
+              <img src={darkMode ? EditDark : Edit} width={25} height={25}/> Edit
             </NavLink>
-            <button className='btn btn-outline-dark' onClick={handleDeleteCollection}>
-              <img src={Trash} width={25} height={25}/> Delete
+            <button className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'}`} onClick={handleDeleteCollection}>
+              <img src={darkMode ? TrashDark : Trash} width={25} height={25}/> Delete
             </button>
           </div>}
         </div>
@@ -153,14 +158,14 @@ const CollectionPage = () => {
         </div>
         {user.id === collection.user_id &&
         <div className='d-flex justify-content-between'>
-          <NavLink to='new-item' className='btn btn-outline-dark me-2'>
-          <img src={New} width={25} height={25}/> New
+          <NavLink to='new-item' className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'} me-2`}>
+          <img src={darkMode ? NewDark : New} width={25} height={25}/> New
           </NavLink>
-          <button className='btn btn-outline-dark' onClick={handleDeleteItems}>
-          <img src={Trash} width={25} height={25}/> Delete
+          <button className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'}`} onClick={handleDeleteItems}>
+          <img src={darkMode ? TrashDark : Trash} width={25} height={25}/> Delete
           </button>
         </div>}
-        <table className="table table-hover">
+        <table className='table table-hover mt-2'>
           <thead>
             <tr>
               {user.id === collection.user_id &&

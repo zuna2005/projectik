@@ -8,6 +8,7 @@ import { setUser } from "../features/loginSlice"
 
 const EditItem = () => {
     const user = useSelector(state => state.login.currentUser)
+    const darkMode = useSelector(state => state.mode.darkMode)
     const navigate = useNavigate()
     const dispatch = useDispatch()
     let { item_id } = useParams()
@@ -114,8 +115,29 @@ const EditItem = () => {
             dispatch(setUser(updUser))
         }
     }
+    const darkTheme = {
+        control: (styles) => ({
+          ...styles,
+          backgroundColor: '#212529',
+          color: '#adb5bd',
+          borderColor: '#343a40',
+        }),
+        option: (styles, { isSelected }) => ({
+          ...styles,
+          backgroundColor: isSelected ? '#555' : '#212529',
+          color: isSelected ? '#adb5bd' : '#ccc',
+          ':hover': {
+            backgroundColor: '#6c757d', // Change to the desired hover color
+          }
+        }),
+        multiValue: (styles) => ({
+          ...styles,
+          backgroundColor: '#666',
+          color: '#fff',
+        }),
+      };
   return (
-    <div className='d-flex flex-column align-items-center'>
+    <div className={`d-flex flex-column align-items-center min-vh-100 ${darkMode ? 'text-bg-dark' : 'bg-light'}`} data-bs-theme={darkMode && "dark"}>
         <div className='d-flex flex-column w-75 mt-4'>
             <h3>Edit Item</h3>
             <form onSubmit={handleSubmit}>
@@ -145,7 +167,8 @@ const EditItem = () => {
                             isMulti 
                             options={options} 
                             defaultValue={defaultOptions}
-                            onChange={handleTagChange} 
+                            onChange={handleTagChange}
+                            styles={darkMode ? darkTheme : {}} 
                             required
                         />
                         )}

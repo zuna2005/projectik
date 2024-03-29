@@ -5,12 +5,14 @@ import axios from 'axios'
 import Lock from '../assets/lock.svg'
 import Unlock from '../assets/unlock.svg'
 import Trash from '../assets/trash.svg'
+import TrashDark from '../assets/trash-dark.svg'
 import UserBlock from '../assets/user-block.svg'
 import UserAdd from '../assets/user-add.svg'
 
 const Admin = () => {
     const dispatch = useDispatch()
     const user = useSelector(state => state.login.currentUser)
+    const darkMode = useSelector(state => state.mode.darkMode)
     const [data, setData] = useState([])
     useEffect(() =>{
         axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/users/all`)
@@ -61,7 +63,7 @@ const Admin = () => {
         }
     }
   return (
-    <div className='d-flex flex-column align-items-center'>
+    <div className={`d-flex flex-column align-items-center min-vh-100 ${darkMode ? 'text-bg-dark' : 'bg-light'}`} data-bs-theme={darkMode && "dark"}>
       <div className='d-flex flex-column w-75'>
         <h3 className='text-center mt-3'>Admin Panel</h3>
         <div className='d-flex justify-content-between'>
@@ -72,8 +74,8 @@ const Admin = () => {
                 <button className='btn btn-outline-success ms-2' onClick={() => handleChange('Active')}>
                     <img src={Unlock} width={25} height={25}/> Unblock
                 </button>
-                <button className='btn btn-outline-dark ms-2' onClick={() => handleChange('delete')}>
-                    <img src={Trash} width={25} height={25}/> Delete
+                <button className={`btn btn-outline-${darkMode ? 'light' : 'dark'} ms-2`} onClick={() => handleChange('delete')}>
+                    <img src={darkMode ? TrashDark : Trash} width={25} height={25}/> Delete
                 </button>
             </div>
             <div>

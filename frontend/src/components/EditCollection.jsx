@@ -5,6 +5,9 @@ import axios from 'axios'
 import New from '../assets/plus.svg'
 import Trash from '../assets/trash.svg'
 import Edit from '../assets/edit.svg'
+import NewDark from '../assets/plus-dark.svg'
+import TrashDark from '../assets/trash-dark.svg'
+import EditDark from '../assets/edit-dark.svg'
 import DeleteModal from './DeleteModal'
 import fieldConvertApptoDb from '../helpers/fieldConvert'
 import updateUser from '../helpers/UpdateUser'
@@ -13,6 +16,7 @@ import { setUser } from "../features/loginSlice"
 const EditCollection = () => {
     const { coll_id } = useParams()
     const user = useSelector(state => state.login.currentUser)
+    const darkMode = useSelector(state => state.mode.darkMode)
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
@@ -150,11 +154,11 @@ const EditCollection = () => {
         }
     }
   return (
-    <div className='d-flex flex-column align-items-center'>
+    <div className={`d-flex flex-column align-items-center min-vh-100 ${darkMode ? 'text-bg-dark' : 'bg-light'}`}>
         <div className='d-flex flex-column w-75 mt-4'>
             <h3>Edit Collection</h3>
             <form onSubmit={handleSubmit}>
-                <div className='container'>
+                <div className='container' data-bs-theme={darkMode && "dark"}>
                     <div className='row'>
                         <div className='col'>
                             <label htmlFor="collection-name" className="form-label">Name</label>
@@ -198,9 +202,13 @@ const EditCollection = () => {
                         </div>
                     </div>
                     <div className='row mt-3 dropdown'>
-                        <button className='btn btn-outline-dark' onClick={(e)=>e.preventDefault()}
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                            <img src={New} width={25} height={25}/> Add Custom Field for Items
+                    <button 
+                            className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'}`} 
+                            onClick={(e)=>e.preventDefault()}
+                            data-bs-toggle="dropdown" 
+                            aria-expanded="false"
+                            >
+                            <img src={darkMode ? NewDark : New} width={25} height={25}/> Add Custom Field for Items
                         </button>
                         <ul className="dropdown-menu">
                             {Object.keys(custom).map(val => {
@@ -257,16 +265,16 @@ const EditCollection = () => {
                                                 {editField == val + key ?
                                                 <button className='btn btn-outline-success ms-3' onClick={(e) => handleSaveEditField(e, val, key)}>Save</button>
                                                 : <div className='d-flex flex-row'>
-                                                    <button className='btn btn-outline-dark ms-2' onClick={() => setEditField(val + key)}>
-                                                        <img src={Edit} width={25} height={25}/>
+                                                    <button className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'} ms-2`} onClick={() => setEditField(val + key)}>
+                                                        <img src={darkMode ? EditDark : Edit} width={25} height={25}/>
                                                     </button>
                                                     <button 
-                                                        className='btn btn-outline-dark ms-1' 
+                                                        className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'} ms-1`} 
                                                         data-bs-toggle="modal" 
                                                         data-bs-target="#deleteModal" 
                                                         onClick={(e) => e.preventDefault(e)}
                                                         >
-                                                        <img src={Trash} width={25} height={25}/>
+                                                        <img src={darkMode ? TrashDark : Trash} width={25} height={25}/>
                                                     </button>
                                                     <DeleteModal onDeleteField={handleDeleteField} fieldType={val} fieldIndex={key}/>
                                                 </div>}

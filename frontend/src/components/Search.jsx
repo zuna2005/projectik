@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import { useSelector } from 'react-redux'
 
 const Search = () => {
     const { search } = useLocation()
     const params = new URLSearchParams(search)
     const query = params.get('query')
+    const darkMode = useSelector(state => state.mode.darkMode)
     const navigate = useNavigate()
     const [items, setItems] = useState([])
     const [collections, setCollections] = useState([])
@@ -25,7 +27,7 @@ const Search = () => {
         .catch(err => console.log(err))
       }, [query])
   return (
-    <div className='d-flex flex-column align-items-center'>
+    <div className={`d-flex flex-column align-items-center min-vh-100 ${darkMode ? 'text-bg-dark' : 'bg-light'}`} data-bs-theme={darkMode && "dark"}>
         <div className='d-flex flex-column w-75'>
         <h3 className='my-4'>Search Results for {query.startsWith('#') && 'tag'} "{query}"</h3>
         {items.length != 0 && <h4>Items</h4>}

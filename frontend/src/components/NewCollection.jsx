@@ -5,10 +5,13 @@ import axios from 'axios'
 import updateUser from '../helpers/UpdateUser'
 import { setUser } from "../features/loginSlice"
 import New from '../assets/plus.svg'
+import NewDark from '../assets/plus-dark.svg'
 import Trash from '../assets/trash.svg'
+import TrashDark from '../assets/trash-dark.svg'
 
 const NewCollection = () => {
     const user = useSelector(state => state.login.currentUser)
+    const darkMode = useSelector(state => state.mode.darkMode)
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
@@ -83,17 +86,23 @@ const NewCollection = () => {
             setNewFieldName('')
         }
     }
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault()
+            handleSaveNewField(e)
+        }
+    }
   return (
-    <div className='d-flex flex-column align-items-center'>
+    <div className={`d-flex flex-column align-items-center min-vh-100 ${darkMode ? 'text-bg-dark' : 'bg-light'}`}>
         <div className='d-flex flex-column w-75 mt-4'>
             <h3>New Collection</h3>
             <form onSubmit={handleSubmit}>
-                <div className='container'>
+                <div className='container' data-bs-theme={darkMode && "dark"}>
                     <div className='row'>
                         <div className='col'>
                             <label htmlFor="collection-name" className="form-label">Name</label>
                         </div>
-                        <div className='col-6 w-75'>
+                        <div className='col-6 w-75' >
                             <input type="text" className="form-control" id="collection-name" name='name' placeholder="My Collection" required />
                         </div>
                     </div>   
@@ -118,9 +127,13 @@ const NewCollection = () => {
                         </div>
                     </div>
                     <div className='row mt-3 dropdown'>
-                        <button className='btn btn-outline-dark' onClick={(e)=>e.preventDefault()}
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                            <img src={New} width={25} height={25}/> Add Custom Field for Items
+                        <button 
+                            className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'}`} 
+                            onClick={(e)=>e.preventDefault()}
+                            data-bs-toggle="dropdown" 
+                            aria-expanded="false"
+                            >
+                            <img src={darkMode ? NewDark : New} width={25} height={25}/> Add Custom Field for Items
                         </button>
                         <ul className="dropdown-menu">
                             {Object.keys(customFields).map(val => {
@@ -138,8 +151,15 @@ const NewCollection = () => {
                         </div>
                         <div className='col-6 w-75'>
                             <div className='d-flex flex-row'>
-                                <input type="text" className="form-control" id="newField" name="newField"
-                                placeholder="Enter name of the custom field" onChange={(e) => setNewFieldName(e.target.value)}required />
+                                <input 
+                                    type="text" 
+                                    className="form-control" 
+                                    id="newField" 
+                                    name="newField"
+                                    placeholder="Enter name of the custom field" 
+                                    onChange={(e) => setNewFieldName(e.target.value)}
+                                    onKeyDown={handleKeyPress}
+                                    required />
                                 <button className='btn btn-outline-success ms-3' onClick={handleSaveNewField}>Save</button>
                             </div>
                         </div>
@@ -160,8 +180,11 @@ const NewCollection = () => {
                                                 <input type="text" className="form-control" 
                                                 id={'id' + val + i} name={val + i} value={values[i - 1] || ''}
                                                 disabled />
-                                                <button className='btn btn-outline-dark ms-3' onClick={(e) => handleDeleteField(e, val, values[i - 1])}>
-                                                    <img src={Trash} width={25} height={25}/>
+                                                <button 
+                                                    className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'} ms-3`} 
+                                                    onClick={(e) => handleDeleteField(e, val, values[i - 1])}
+                                                    >
+                                                    <img src={darkMode ? TrashDark : Trash} width={25} height={25}/>
                                                 </button>
                                             </div>
                                         </div>

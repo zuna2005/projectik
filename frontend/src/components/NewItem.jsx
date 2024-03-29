@@ -8,6 +8,7 @@ import { setUser } from "../features/loginSlice"
 
 const NewItem = () => {
     const user = useSelector(state => state.login.currentUser)
+    const darkMode = useSelector(state => state.mode.darkMode)
     const navigate = useNavigate()
     const dispatch = useDispatch()
     let { coll_id } = useParams()
@@ -99,8 +100,29 @@ const NewItem = () => {
             dispatch(setUser(updUser))
         } 
     }
+    const darkTheme = {
+        control: (styles) => ({
+          ...styles,
+          backgroundColor: '#212529',
+          color: '#adb5bd',
+          borderColor: '#343a40',
+        }),
+        option: (styles, { isSelected }) => ({
+          ...styles,
+          backgroundColor: isSelected ? '#555' : '#212529',
+          color: isSelected ? '#adb5bd' : '#ccc',
+          ':hover': {
+            backgroundColor: '#6c757d', // Change to the desired hover color
+          }
+        }),
+        multiValue: (styles) => ({
+          ...styles,
+          backgroundColor: '#666',
+          color: '#fff',
+        }),
+      };
   return (
-    <div className='d-flex flex-column align-items-center'>
+    <div className={`d-flex flex-column align-items-center min-vh-100 ${darkMode ? 'text-bg-dark' : 'bg-light'}`} data-bs-theme={darkMode && "dark"}>
         <div className='d-flex flex-column w-75 mt-4'>
             <h3>New Item</h3>
             <form onSubmit={handleSubmit}>
@@ -118,11 +140,19 @@ const NewItem = () => {
                             <label htmlFor="tags" className="form-label">Tags</label>
                         </div>
                         <div className='col-6 w-75'>
-                            <CreatableSelect isMulti options={options} onChange={handleTagChange} required/>
+                            <CreatableSelect 
+                                isMulti 
+                                options={options} 
+                                onChange={handleTagChange} 
+                                styles={darkMode ? darkTheme : {}}
+                                required/>
                         </div>
                     </div>
-                    <hr />
-                    <h5>Custom Fields</h5>
+                    {Object.keys(collection).filter(val => val.includes('state') && collection[val] == 1).length > 0 &&
+                    <div>
+                        <hr />
+                        <h5>Custom Fields</h5>
+                    </div>}
                     {Object.keys(collection).filter(val => val.includes('state') && collection[val] == 1).map(val => {
                         const field = val.slice(0, val.indexOf('state'))
                         const fieldName = field + 'name'
