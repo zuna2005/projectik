@@ -41,8 +41,8 @@ function App() {
         <Route path='/largest-collections' element={<LargestCollections />} />
         <Route path='/tag-cloud' element={<TagCloud />} />
         <Route path='/search' element={<Search />} />
-        <Route path='/my-page' element={user.status == 'Active' ? <MyPage /> : <Navigate to='/' />} />
-        <Route path='/my-page/new-collection' element={user.status == 'Active' ? <NewCollection /> : <Navigate to='/' />} />
+        <Route path='/user-page/:user_id' element={<MyPage />} />
+        <Route path='/user-page/:user_id/new-collection' element={user.status == 'Active' ? <NewCollection /> : <Navigate to='/' />} />
         <Route path='/collection-page/:coll_id' element={<CollectionPage />} />
         <Route path='/collection-page/:coll_id/edit-collection' element={user.status == 'Active' ? <EditCollection /> : <Navigate to='/' />} />
         <Route path='/collection-page/:coll_id/new-item' element={user.status == 'Active' ? <NewItem /> : <Navigate to='/' />} />

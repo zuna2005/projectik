@@ -41,7 +41,7 @@ const NavBar = () => {
         <div className="my-3 position-relative">
             <div className="position-absolute" style={{top: '0px', left: '0px'}}>
                 {user.status == 'Active' ?
-                <NavLink to='my-page' type='button' className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'}`}>
+                <NavLink to={`user-page/${user.id}`} type='button' className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'}`}>
                     <img src={darkMode ? PersonDark : Person} width={25} height={25}/> My Page
                 </NavLink> :
                 <h3>Collection Cloud <img src={darkMode ? CloudDark : Cloud} width={30} height={30}/></h3>}

@@ -8,9 +8,11 @@ import Trash from '../assets/trash.svg'
 import TrashDark from '../assets/trash-dark.svg'
 import UserBlock from '../assets/user-block.svg'
 import UserAdd from '../assets/user-add.svg'
+import { useNavigate } from 'react-router-dom'
 
 const Admin = () => {
     const dispatch = useDispatch()
+    const navigate = useNavigate()
     const user = useSelector(state => state.login.currentUser)
     const darkMode = useSelector(state => state.mode.darkMode)
     const [data, setData] = useState([])
@@ -103,7 +105,7 @@ const Admin = () => {
           <tbody>
             {data.map((val, ind) => {
               return (
-                <tr key={val.id}>
+                <tr key={val.id} onClick={() => navigate(`/user-page/${val.id}`)}>
                   <td>
                   <input 
                     type="checkbox"

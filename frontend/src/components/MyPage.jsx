@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink, useNavigate, useParams } from 'react-router-dom'
 import {useDispatch, useSelector} from 'react-redux'
 import axios from 'axios'
 import updateUser from '../helpers/UpdateUser'
@@ -12,8 +12,10 @@ import TrashDark from '../assets/trash-dark.svg'
 const MyPage = () => {
   const user = useSelector(state => state.login.currentUser)
   const darkMode = useSelector(state => state.mode.darkMode)
+  const { user_id } = useParams()
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const [author, setAuthor] = useState('')
   const [data, setData] = useState([])
   useEffect(() =>{
     const getUpdUser = async () => {
@@ -21,16 +23,18 @@ const MyPage = () => {
       console.log('updUser', updUser)
       dispatch(setUser(updUser))
     }
-    getUpdUser()
-    let req = {
-      user_id: user.id
-    }
-    axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/collections/mycollections`, req)
+    user.status != '' && getUpdUser()
+    axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/collections/mycollections`, { user_id })
     .then(res => {
       setData(res.data)
     })
     .catch(err => console.log(err))
-  }, [])
+    axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/users/user`, { id: user_id })
+    .then(res => {
+      setAuthor(res.data[0])
+    })
+    .catch(err => console.log(err))
+  }, [user_id])
 
   const [checkedItems, setCheckedItems] = useState({})
   const [allChecked, setAllChecked] = useState(false)
@@ -88,22 +92,24 @@ const MyPage = () => {
     <div className={`d-flex flex-column align-items-center min-vh-100 ${darkMode ? 'text-bg-dark' : 'bg-light'}`} data-bs-theme={darkMode && "dark"}>
       <div className='d-flex flex-column w-75'>
         <div className='d-flex justify-content-between my-4'>
-        <h3>My Collections</h3>
-          <div>
+        <h3>Collections of {author.name}</h3>
+          {(user.id == user_id || user.admin == 1) &&
+            <div>
             <NavLink to='new-collection' className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'} me-2`}>
             <img src={darkMode ? NewDark : New} width={25} height={25}/> New
             </NavLink>
             <button className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'}`} onClick={handleDelete}>
             <img src={darkMode? TrashDark : Trash} width={25} height={25}/> Delete
             </button>
-          </div>
+          </div>}
         </div>
         <table className='table table-hover'>
           <thead>
             <tr>
+              {(user.id == user_id || user.admin == 1) && 
               <th >
                 <input className="form-check-input" type="checkbox" checked={allChecked} onChange={handleCheckboxChangeAll}/>
-              </th>
+              </th>}
               <th>Name</th>
               <th>Description</th>
               <th>Category</th>
@@ -112,16 +118,18 @@ const MyPage = () => {
           </thead>
           <tbody>
             {data.map((val) => {
-              return (<tr key={val.id} onClick={(e) => handleCollectionPage(e, val.id)}>
-                <td>
-                  <input 
-                    type="checkbox"
-                    name={val.id}
-                    checked={checkedItems[val.id]}
-                    onChange={handleCheckboxChange}
-                    onClick={(e) => e.stopPropagation()}
-                  />
-                  </td>
+              return (
+                <tr key={val.id} onClick={(e) => handleCollectionPage(e, val.id)}>
+                  {(user.id == user_id || user.admin == 1) &&
+                  <td>
+                    <input 
+                      type="checkbox"
+                      name={val.id}
+                      checked={checkedItems[val.id]}
+                      onChange={handleCheckboxChange}
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  </td>}
                   <td>{val.collection_name}</td>
                   <td>{val.description}</td>
                   <td>{val.category_name}</td>

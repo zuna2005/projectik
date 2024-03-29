@@ -151,6 +151,20 @@ const CollectionPage = () => {
               <h4 className='lead ms-3'>{collection.category}</h4>
             </div>
           </div>
+          <div className='row mt-3'>
+            <div className='col'>
+              <h5>Author:</h5>
+            </div>
+            <div className='col-6 w-75'>
+              <h4 
+                className='lead ms-3' 
+                onClick={() => navigate(`/user-page/${collection.user_id}`)}
+                style={{ cursor: 'pointer' }}
+                >
+                  <u>{collection.user_name}</u>
+              </h4>
+            </div>
+          </div>
         </div>
         <hr />
         <div className='d-flex justify-content-center'>

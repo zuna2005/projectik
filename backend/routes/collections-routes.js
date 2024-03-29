@@ -21,10 +21,13 @@ const getMyColl = (req, res) => {
 
 const getColl = (req, res) => {
     const getCollectionQuery = `
-    SELECT collections.*, categories.name AS category
+    SELECT collections.*, 
+           categories.name AS category, 
+           users.name AS user_name
     FROM collections
     INNER JOIN categories ON collections.category_id = categories.id
-    WHERE collections.id = ?`;
+    INNER JOIN users ON collections.user_id = users.id
+    WHERE collections.id = ?`
     db.query(getCollectionQuery, [req.body.coll_id], (err, data) => {
         if (err) {
             console.error('Database error:', err);

@@ -103,6 +103,7 @@ const ItemPage = () => {
             <div className='col-6 w-75'>
               <h6 className={`text-body-${darkMode ? 'light' : 'secondary'}`}>#id {item.id}</h6>
               <h5><span className='lead'>of collection </span>"<u style={{ cursor: 'pointer' }} onClick={() => navigate(`/collection-page/${collection.id}`)}>{collection.name}</u>"</h5>
+              <h5><span className='lead'>by </span>"<u style={{ cursor: 'pointer' }} onClick={() => navigate(`/user-page/${item.user_id}`)}>{collection.user_name}</u>"</h5>
               <h5 className={`text-body-${darkMode ? 'light' : 'secondary'}`}>Likes: {item.likes ? item.likes.split(',').length : 0} 
                 {user.status == 'Active' && 
                 <button className='btn' onClick={handleLike}>{liked ? 
