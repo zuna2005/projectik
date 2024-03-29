@@ -124,7 +124,7 @@ const CollectionPage = () => {
             </button>
           </div>
           <h3 className="w-100 text-center" style={{right: '50%'}}>Collection "{collection.name}"</h3>
-          {user.id === collection.user_id &&
+          {(user.id === collection.user_id || user.admin == 1) &&
           <div className="position-absolute" style={{top: '0px', right: '0px'}}>
             <NavLink to='edit-collection' className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'} me-2`}>
               <img src={darkMode ? EditDark : Edit} width={25} height={25}/> Edit
@@ -156,7 +156,7 @@ const CollectionPage = () => {
         <div className='d-flex justify-content-center'>
           <h4>Items</h4>
         </div>
-        {user.id === collection.user_id &&
+        {(user.id === collection.user_id || user.admin == 1) &&
         <div className='d-flex justify-content-between'>
           <NavLink to='new-item' className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'} me-2`}>
           <img src={darkMode ? NewDark : New} width={25} height={25}/> New
@@ -168,7 +168,7 @@ const CollectionPage = () => {
         <table className='table table-hover mt-2'>
           <thead>
             <tr>
-              {user.id === collection.user_id &&
+              {(user.id === collection.user_id || user.admin == 1) &&
               <th>
                 <input 
                   className="form-check-input me-1" 
@@ -190,7 +190,7 @@ const CollectionPage = () => {
           <tbody>
             {items.map((item) => {
               return (<tr key={item.id} onClick={(e) => handleItemPage(e, item.id)}>
-                {user.id === collection.user_id &&
+                {(user.id === collection.user_id || user.admin == 1) &&
                 <td>
                   <input 
                     type="checkbox"

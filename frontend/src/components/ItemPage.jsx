@@ -88,7 +88,7 @@ const ItemPage = () => {
             </button>
           </div>
           <h3 className="w-100 text-center" style={{right: '50%'}}>Item "{item.name}"</h3>
-          {user.id === item.user_id &&
+          {(user.id === item.user_id || user.admin == 1) &&
           <div className="position-absolute" style={{top: '0px', right: '0px'}}>
             <NavLink to='edit-item' className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'} me-2`}>
               <img src={darkMode ? EditDark : Edit} width={25} height={25}/> Edit
@@ -129,7 +129,12 @@ const ItemPage = () => {
               <h4>Tags:</h4>
               {item.tags && item.tags.split(', ').map(tag => {
                 return (
-                  <h5 className='lead'>{tag}</h5>
+                  <button 
+                  className={`btn me-3 mb-2 ${darkMode ? 'btn-dark border' : 'btn-outline-dark'}`} 
+                  onClick={() => navigate(`/search?query=${encodeURIComponent(tag)}`)}
+                  >
+                    {tag} 
+                  </button>
                 )
               })}
             </div>
