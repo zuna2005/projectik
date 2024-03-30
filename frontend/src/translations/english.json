@@ -55,6 +55,12 @@
   "emailExistsMessage": "User with this email already exists. Maybe try login?",
   "incorrectPassword": "Incorrect password",
   "userNotFound": "User not found",
+  "order": "Order",
+  "ascending": "Ascending",
+  "descending": "Descending",
+  "byTags": "by tags",
+  "toFilter": "Filter",
+  "removeFilters": "Remove all filters",
   "deleteModal": {
     "title": "Custom Field Deletion",
     "confirmation": "Are you sure you want to delete the custom field? It will permanently remove all of the content of that field in all items of the collection."
@@ -86,7 +92,9 @@
     "block": "Block",
     "unblock": "Unblock",
     "addAdmin": "Add Admin",
-    "deleteAdmin": "Delete Admin"
+    "deleteAdmin": "Delete Admin",
+    "sort": "Sort by",
+    "filter": "Filter"
   },
   "categories": {
     "Books": "Books",

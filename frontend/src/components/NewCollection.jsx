@@ -63,7 +63,7 @@ const NewCollection = () => {
             axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/collections/create`, values)
             .then(res => {
             console.log(res.data)
-            navigate('/my-page')
+            navigate(`/user-page/${user.id}`)
             })
             .catch(err => console.log(err))
         } else {

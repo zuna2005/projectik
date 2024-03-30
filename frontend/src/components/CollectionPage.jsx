@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { NavLink, useNavigate, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import Select from 'react-select'
 import axios from 'axios'
 import fetchItemsAndTags from '../helpers/fetchItemsAndTags'
 import updateUser from '../helpers/UpdateUser'
@@ -14,6 +15,10 @@ import NewDark from '../assets/plus-dark.svg'
 import TrashDark from '../assets/trash-dark.svg'
 import EditDark from '../assets/edit-dark.svg'
 import BackDark from '../assets/arrow-left-dark.svg'
+import Sort from '../assets/sort.svg'
+import Filter from '../assets/filter.svg'
+import SortDark from '../assets/sort-dark.svg'
+import FilterDark from '../assets/filter-dark.svg'
 
 const CollectionPage = () => {
   let { coll_id } = useParams()
@@ -25,6 +30,15 @@ const CollectionPage = () => {
 
   const [collection, setCollection] = useState({})
   const [items, setItems] = useState([])
+  const [displayedItems, setDisplayedItems] = useState([])
+  const [tags, setTags] = useState([])
+  const [checkedItems, setCheckedItems] = useState({})
+  const [allChecked, setAllChecked] = useState(false)
+  const [selectedTags, setSelectedTags] = useState([])
+  const [sortField, setSortField] = useState('id')
+  const [sortOrder, setSortOrder] = useState('asc')
+  const [sortOptions, setSortOptions] = useState([])
+
   useEffect(() =>{
     const getUpdUser = async () => {
       const updUser = await updateUser(user.id)
@@ -34,20 +48,33 @@ const CollectionPage = () => {
     user.status != '' && getUpdUser()
     axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/collections/getcollection`, {coll_id})
     .then(res => {
-        setCollection(res.data[0])
+      const coll = res.data[0]
+      setCollection(coll)
+      const customFields = Object.keys(coll).filter(val => val.includes('state') && coll[val] == 1 && !val.includes('text')).map(val => {
+        const field = val.slice(0, val.indexOf('state'))
+        return {label: coll[field + 'name'], value: field + 'value'}
+      })
+      setSortOptions([
+        {label: 'Id', value: 'id'}, 
+        {label: 'itemName', value: 'name'}, 
+        {label: 'tags', value: 'tags'}, 
+        ...customFields])
     })
     .catch(err => console.log(err))
     axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/items/getByColl`, { coll_id })
     .then(async res => {
       const itemsWithTags = await fetchItemsAndTags(res.data)
       setItems(itemsWithTags)
+      setDisplayedItems(itemsWithTags)
     })
     .catch(err => console.log(err))
-
+    axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/tags/allTags`)
+        .then(res => {
+            const data = res.data.map(val => ({ value: val.id, label: val.name }));
+            setTags(data)
+        })
+        .catch(err => console.log(err))
   }, [])
-
-  const [checkedItems, setCheckedItems] = useState({})
-  const [allChecked, setAllChecked] = useState(false)
 
   const handleCheckboxChange = (event) => {
     setCheckedItems(prev => ({...prev, [event.target.name]: event.target.checked}));
@@ -116,6 +143,55 @@ const CollectionPage = () => {
     e.preventDefault()
     navigate(`/item-page/${item_id}`)
   }
+  const handleSort = (field, order) => {
+    if (field.includes('int') || field.includes('checkbox') || field == 'id')
+      setDisplayedItems(order == 'asc' ? displayedItems.sort((a, b) => a[field] - b[field]) : displayedItems.sort((a, b) => b[field] - a[field]))
+    else
+      setDisplayedItems(order == 'asc' ? displayedItems.sort((a, b) => a[field].localeCompare(b[field])) : displayedItems.sort((a, b) => b[field].localeCompare(a[field])))
+    
+  }
+  const handleTagChange = (selectedOption) => {
+    console.log(selectedOption)
+    setSelectedTags(selectedOption)
+  }
+  const handleFilter = () => {
+    if (selectedTags.length > 0) {
+      const filteredItems = items.filter(item => {
+        for (let tag of selectedTags) {
+          if (item.tags.includes(tag.label))
+            return true
+        }
+        return false})
+      setDisplayedItems(filteredItems)
+      handleSort()
+    }
+    console.log('filter')
+  }
+  const handleRemoveFilters = () => {
+    setDisplayedItems(items)
+    handleSort()
+  }
+  const darkTheme = {
+    control: (styles) => ({
+      ...styles,
+      backgroundColor: '#212529',
+      color: '#adb5bd',
+      borderColor: '#343a40',
+    }),
+    option: (styles, { isSelected }) => ({
+      ...styles,
+      backgroundColor: isSelected ? '#555' : '#212529',
+      color: isSelected ? '#adb5bd' : '#ccc',
+      ':hover': {
+        backgroundColor: '#6c757d',
+      }
+    }),
+    multiValue: (styles) => ({
+      ...styles,
+      backgroundColor: '#666',
+      color: '#fff',
+    }),
+  }
   return (
     <div className={`d-flex flex-column align-items-center min-vh-100 ${darkMode ? 'text-bg-dark' : 'bg-light'}`} data-bs-theme={darkMode && "dark"}>
       <div className='d-flex flex-column w-75'>
@@ -172,16 +248,90 @@ const CollectionPage = () => {
         <div className='d-flex justify-content-center'>
           <h4>{t('items')}</h4>
         </div>
-        {(user.id === collection.user_id || user.admin == 1) &&
-        <div className='d-flex justify-content-between'>
-          <NavLink to='new-item' className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'} me-2`}>
-          <img src={darkMode ? NewDark : New} width={25} height={25}/> {t('buttons.new')}
-          </NavLink>
-          <button className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'}`} onClick={handleDeleteItems}>
-          <img src={darkMode ? TrashDark : Trash} width={25} height={25}/> {t('buttons.delete')}
-          </button>
-        </div>}
-        <table className='table table-hover mt-2'>
+        <div className={`d-flex justify-content-${(user.id === collection.user_id || user.admin == 1) ? 'between' : 'end'}`}>
+          {(user.id === collection.user_id || user.admin == 1) &&
+          <div>
+            <NavLink to='new-item' className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'} me-2`}>
+              <img src={darkMode ? NewDark : New} width={25} height={25}/> {t('buttons.new')}
+            </NavLink>
+            <button className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'}`} onClick={handleDeleteItems}>
+              <img src={darkMode ? TrashDark : Trash} width={25} height={25}/> {t('buttons.delete')}
+            </button>
+          </div>
+          }
+          <div className='d-flex flex-row'>
+            <div className='dropdown'>
+              <button 
+                className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'} me-2`}
+                data-bs-toggle="dropdown" 
+                aria-expanded="false"
+                >
+                  <img src={darkMode ? SortDark : Sort} width={25} height={25}/> {t('buttons.sort')}
+              </button>
+              <ul className="dropdown-menu" onClick={(e) => e.stopPropagation()}>
+                {sortOptions.map(option => {
+                  return (
+                  <li 
+                    className={`dropdown-item ${sortField === option.value && 'active'}`}
+                    onClick={() => {setSortField(option.value); handleSort(option.value, sortOrder)}}
+                    >
+                      {t(option.label)}
+                    </li>
+                  )
+                })}
+                <li><hr class="dropdown-divider" /></li>
+                <li><span class="dropdown-item-text">{t('order')}:</span></li>
+                <li 
+                  className={`dropdown-item ${sortOrder === 'asc' && 'active'}`}
+                  onClick={() => {setSortOrder('asc'); handleSort(sortField, 'asc')}}
+                  >
+                    {t('ascending')}
+                </li>
+                <li 
+                  className={`dropdown-item ${sortOrder === 'desc' && 'active'}`}
+                  onClick={() => {setSortOrder('desc'); handleSort(sortField, 'desc')}}
+                  >
+                    {t('descending')}
+                </li>
+              </ul>
+            </div>
+            <button 
+              className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'}`}
+              data-bs-toggle="collapse" 
+              data-bs-target="#collapseFilter" 
+              aria-expanded="false" 
+              aria-controls="collapseFilter"
+            >
+              <img src={darkMode ? FilterDark : Filter} width={25} height={25}/> {t('buttons.filter')}
+            </button>
+          </div>
+          
+        </div>
+        <div className='position-relative'>
+          <div className="collapse mt-2 w-50 position-absolute end-0" id="collapseFilter">
+            <div className="card card-body">
+              <div className='row mt-1'>
+                <div className='col'>
+                  <h6>{t('byTags')}</h6>
+                </div>
+                <div className='col-6 w-75'>
+                  <Select 
+                    isMulti 
+                    options={tags}
+                    onChange={handleTagChange}
+                    styles={darkMode ? darkTheme : {}}
+                    placeholder={t('select')}
+                  />
+                </div>
+              </div>
+              <div className='d-flex justify-content-between mt-3'>
+              <button className='btn btn-outline-success' onClick={handleFilter}>{t('toFilter')}</button>
+              <button className='btn btn-outline-danger' onClick={handleRemoveFilters}>{t('removeFilters')}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <table className='table table-hover mt-3'>
           <thead>
             <tr>
               {(user.id === collection.user_id || user.admin == 1) &&
@@ -204,7 +354,7 @@ const CollectionPage = () => {
             </tr>
           </thead>
           <tbody>
-            {items.map((item) => {
+            {displayedItems.map((item) => {
               return (<tr key={item.id} onClick={(e) => handleItemPage(e, item.id)}>
                 {(user.id === collection.user_id || user.admin == 1) &&
                 <td>
