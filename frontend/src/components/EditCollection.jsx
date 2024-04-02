@@ -167,7 +167,7 @@ const EditCollection = () => {
                         <div className='col'>
                             <label htmlFor="collection-name" className="form-label">{t('itemName')}</label>
                         </div>
-                        <div className='col-6 w-75'>
+                        <div className={!isMobile && 'col-6 w-75'}>
                             <input 
                                 type="text" 
                                 className="form-control" 
@@ -182,7 +182,7 @@ const EditCollection = () => {
                         <div className='col'>
                             <label htmlFor="collection-description" className="form-label">{t('description')}</label>
                         </div>
-                        <div className='col-6 w-75'>
+                        <div className={!isMobile && 'col-6 w-75'}>
                             <textarea 
                                 className="form-control" 
                                 id="collection-description" 
@@ -197,7 +197,7 @@ const EditCollection = () => {
                         <div className='col'>
                             <label htmlFor="category" className="form-label">{t('category')}</label>
                         </div>
-                        <div className='col-6 w-75'>
+                        <div className={!isMobile && 'col-6 w-75'}>
                         <select className="form-select" name="category" required>
                             {categories.map( (val) => {
                                 return(<option name={val.id} key={val.name} selected={val.id == collection.category_id}>{val.name}</option>)

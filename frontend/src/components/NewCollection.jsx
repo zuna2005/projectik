@@ -106,7 +106,7 @@ const NewCollection = () => {
                         <div className='col'>
                             <label htmlFor="collection-name" className="form-label">{t('itemName')}</label>
                         </div>
-                        <div className='col-6 w-75' >
+                        <div className={!isMobile && 'col-6 w-75'} >
                             <input type="text" className="form-control" id="collection-name" name='name' placeholder={t('myCollection')} required />
                         </div>
                     </div>   
@@ -114,7 +114,7 @@ const NewCollection = () => {
                         <div className='col'>
                             <label htmlFor="collection-description" className="form-label">{t('description')}</label>
                         </div>
-                        <div className='col-6 w-75'>
+                        <div className={!isMobile && 'col-6 w-75'}>
                             <textarea className="form-control" id="collection-description" name='description' rows="3" placeholder={t('myCollectionDescription')} required />
                         </div>
                     </div>
@@ -122,7 +122,7 @@ const NewCollection = () => {
                         <div className='col'>
                             <label htmlFor="category" className="form-label">{t('category')}</label>
                         </div>
-                        <div className='col-6 w-75'>
+                        <div className={!isMobile && 'col-6 w-75'}>
                         <select className="form-select" name="category" required>
                             {categories.map( (val) => {
                                 return(<option name={val.id} key={val.name}>{t(`categories.${val.name}`)}</option>)
