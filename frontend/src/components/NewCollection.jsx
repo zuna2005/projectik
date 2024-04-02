@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {useDispatch, useSelector} from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useMediaQuery } from 'react-responsive'
 import axios from 'axios'
 import updateUser from '../helpers/UpdateUser'
 import { setUser } from "../features/loginSlice"
@@ -16,6 +17,7 @@ const NewCollection = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const [t, i18n] = useTranslation()
+    const isMobile = useMediaQuery({ query: '(max-width: 425px)' })
 
     const [customFields, setCustomFields] = useState({
         'Integer': 0,
@@ -175,7 +177,7 @@ const NewCollection = () => {
                             for (let i = 1; i <= count; i++) {
                                 fields.push(<div className='row mt-3'>
                                         <div className='col'>
-                                            <label htmlFor={'id' + val + i} className="form-label">{`${t('Name of Field')} №${i}`}</label>
+                                            <label htmlFor={'id' + val + i} className="form-label">{`${isMobile ? '' : t('Name of Field')} №${i}`}</label>
                                         </div>
                                         <div className='col-6 w-75'>
                                             <div className='d-flex flex-row '>
@@ -201,7 +203,7 @@ const NewCollection = () => {
                     })}
                     </div>
                 </div>
-                <div className='mt-4'>
+                <div className='my-4'>
                     <button type='submit' className='btn btn-outline-success me-3'>{t('buttons.create')}</button>
                     <Link to={`/user-page/${user.id}`} className='btn btn-outline-danger'>{t('buttons.cancel')}</Link>
                 </div>

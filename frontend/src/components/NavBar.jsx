@@ -44,21 +44,21 @@ const NavBar = () => {
     }
   return (
     <div className={`d-flex flex-column align-items-center ${darkMode ? 'text-bg-dark' : 'bg-light'}`} data-bs-theme={darkMode && "dark"}>
-    <div className='d-flex flex-column w-75'>
-        <div className="my-3 position-relative">
-            <div className="position-absolute" style={{top: '0px', left: '0px'}}>
+    <div className='d-flex justify-content-center'>
+        <div className="my-3 d-flex gap-2 flex-wrap justify-content-center">
+            <div className='d-flex gap-2 flex-wrap'>
                 {user.status == 'Active' ?
                 <NavLink to={`user-page/${user.id}`} type='button' className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'}`}>
                     <img src={darkMode ? PersonDark : Person} width={25} height={25}/> {t('myPage')}
                 </NavLink> :
                 <h3>{t('collectionCloud')} <img src={darkMode ? CloudDark : Cloud} width={30} height={30}/></h3>}
                 {user.admin == 1 &&
-                <NavLink to='admin' type='button' className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'} ms-3`}>
+                <NavLink to='admin' type='button' className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'}`}>
                     <img src={darkMode ? AdminDark : Admin} width={25} height={25}/> {t('adminPanel')}
                 </NavLink>}
             </div>
-            <form className="d-flex justify-content-center">
-                <div className="input-group w-25">
+            <form className="d-flex align-items-center">
+                <div className="input-group w-100">
                     <input 
                         className="form-control" 
                         type="search" 
@@ -72,11 +72,11 @@ const NavBar = () => {
                 </div>
             </form>
           
-          <div className="position-absolute" style={{top: '0px', right: '0px'}}> 
+          <div className='d-flex align-items-center'> 
             <button className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'} rounded-5 me-3`} onClick={handleMode} >
                 <img src={darkMode ? Light : Dark} width={25} height={25} />
             </button>
-            <button className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'} rounded-5 me-5`} data-bs-toggle="dropdown" aria-expanded="false">
+            <button className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'} rounded-5 me-3`} data-bs-toggle="dropdown" aria-expanded="false">
                 <img src={darkMode ? LanguageDark : Language} width={25} height={25} />
             </button>
             <ul className="dropdown-menu">
@@ -93,8 +93,8 @@ const NavBar = () => {
             }
           </div>
         </div>
-        <Login heading={t('login')}/>
-        <Login heading={t('signUp')}/>
+        {user.status == '' && <Login heading={t('login')}/>}
+        {user.status == '' && <Login heading={t('signUp')}/>}
     </div>
     </div>
   )

@@ -30,6 +30,7 @@ const LargestCollections = () => {
     <div className={`d-flex flex-column align-items-center min-vh-100 ${darkMode ? 'text-bg-dark' : 'bg-light'}`} data-bs-theme={darkMode && "dark"}>
       <div className='d-flex flex-column w-75'>
         <h3 className='text-center my-3'>{t('largestCollections')}</h3>
+        <div className='w-100 overflow-scroll'>
         <table className='table table-hover'>
           <thead>
             <tr>
@@ -56,6 +57,7 @@ const LargestCollections = () => {
           </tbody>
         </table>
       </div>
+    </div>
     </div>
   )
 }

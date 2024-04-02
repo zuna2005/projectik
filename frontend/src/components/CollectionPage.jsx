@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { NavLink, useNavigate, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useMediaQuery } from 'react-responsive'
 import Select from 'react-select'
 import axios from 'axios'
 import fetchItemsAndTags from '../helpers/fetchItemsAndTags'
@@ -27,6 +28,7 @@ const CollectionPage = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const [t, i18n] = useTranslation()
+  const isMobile = useMediaQuery({ query: '(max-width: 425px)' })
 
   const [collection, setCollection] = useState({})
   const [items, setItems] = useState([])
@@ -195,20 +197,18 @@ const CollectionPage = () => {
   return (
     <div className={`d-flex flex-column align-items-center min-vh-100 ${darkMode ? 'text-bg-dark' : 'bg-light'}`} data-bs-theme={darkMode && "dark"}>
       <div className='d-flex flex-column w-75'>
-        <div className="text-center my-4 position-relative">
-          <div className="position-absolute" style={{top: '0px', left: '0px'}}>
-            <button className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'}`} onClick={() => navigate(-1)}>
-              <img src={darkMode ? BackDark : Back} width={25} height={25}/> {t('buttons.back')}
-            </button>
-          </div>
-          <h3 className="w-100 text-center" style={{right: '50%'}}>{t('collection')} "{collection.name}"</h3>
+      <h3 className="text-center mt-4">{t('collection')} "{collection.name}"</h3>
+        <div className="text-center mb-3 d-flex align-items-center justify-content-between">
+          <button className={`btn d-flex ${darkMode ? 'btn-dark border' : 'btn-outline-dark'}`} onClick={() => navigate(`/user-page/${collection.user_id}`)}>
+            <img src={darkMode ? BackDark : Back} width={25} height={25}/> {t('buttons.back')}
+          </button>
           {(user.id === collection.user_id || user.admin == 1) &&
-          <div className="position-absolute" style={{top: '0px', right: '0px'}}>
+          <div>
             <NavLink to='edit-collection' className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'} me-2`}>
-              <img src={darkMode ? EditDark : Edit} width={25} height={25}/> {t('buttons.edit')}
+              <img src={darkMode ? EditDark : Edit} width={25} height={25}/> {!isMobile && t('buttons.edit')}
             </NavLink>
             <button className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'}`} onClick={handleDeleteCollection}>
-              <img src={darkMode ? TrashDark : Trash} width={25} height={25}/> {t('buttons.delete')}
+              <img src={darkMode ? TrashDark : Trash} width={25} height={25}/> {!isMobile && t('buttons.delete')}
             </button>
           </div>}
         </div>
@@ -250,7 +250,7 @@ const CollectionPage = () => {
         </div>
         <div className={`d-flex justify-content-${(user.id === collection.user_id || user.admin == 1) ? 'between' : 'end'}`}>
           {(user.id === collection.user_id || user.admin == 1) &&
-          <div>
+          <div className='d-flex align-items-center flex-wrap'>
             <NavLink to='new-item' className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'} me-2`}>
               <img src={darkMode ? NewDark : New} width={25} height={25}/> {t('buttons.new')}
             </NavLink>
@@ -259,7 +259,7 @@ const CollectionPage = () => {
             </button>
           </div>
           }
-          <div className='d-flex flex-row'>
+          <div className='d-flex flex-wrap'>
             <div className='dropdown'>
               <button 
                 className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'} me-2`}
@@ -308,7 +308,7 @@ const CollectionPage = () => {
           
         </div>
         <div className='position-relative'>
-          <div className="collapse mt-2 w-50 position-absolute end-0" id="collapseFilter">
+          <div className={`collapse mt-2 ${!isMobile && 'w-50'} position-absolute end-0`} id="collapseFilter">
             <div className="card card-body">
               <div className='row mt-1'>
                 <div className='col'>
@@ -331,6 +331,7 @@ const CollectionPage = () => {
             </div>
           </div>
         </div>
+        <div className='w-100 overflow-scroll'>
         <table className='table table-hover mt-3'>
           <thead>
             <tr>
@@ -380,6 +381,7 @@ const CollectionPage = () => {
           </tbody>
         </table>
       </div>
+    </div>
     </div>
   )
 }

@@ -67,11 +67,11 @@ const Admin = () => {
         }
     }
   return (
-    <div className={`d-flex flex-column align-items-center min-vh-100 ${darkMode ? 'text-bg-dark' : 'bg-light'}`} data-bs-theme={darkMode && "dark"}>
+    <div className={`d-flex flex-column min-vw-100 align-items-center min-vh-100 ${darkMode ? 'text-bg-dark' : 'bg-light'}`} data-bs-theme={darkMode && "dark"}>
       <div className='d-flex flex-column w-75'>
         <h3 className='text-center mt-3'>{t('adminPanel')}</h3>
-        <div className='d-flex justify-content-between'>
-            <div>
+        <div className='d-flex justify-content-between flex-wrap gap-2'>
+            <div className='d-flex'>
                 <button className='btn btn-outline-danger' onClick={() => handleChange('Blocked')}>
                     <img src={Lock} width={25} height={25}/> {t('buttons.block')}
                 </button>
@@ -82,7 +82,7 @@ const Admin = () => {
                     <img src={darkMode ? TrashDark : Trash} width={25} height={25}/> {t('buttons.delete')}
                 </button>
             </div>
-            <div>
+            <div className='d-flex'>
                 <button className='btn btn-outline-danger' onClick={() => handleChange(false)}>
                     <img src={UserBlock} width={25} height={25}/> {t('buttons.deleteAdmin')}
                 </button>
@@ -91,6 +91,7 @@ const Admin = () => {
                 </button>
             </div>
         </div>
+        <div className='w-100 overflow-scroll'>
         <table className="table table-hover mt-3">
           <thead>
             <tr>
@@ -126,6 +127,7 @@ const Admin = () => {
             })}
           </tbody>
         </table>
+      </div>
       </div>
     </div>
   )

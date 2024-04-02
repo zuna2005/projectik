@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { NavLink, useNavigate, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useMediaQuery } from 'react-responsive'
 import axios from 'axios'
 import fetchItemsAndTags from '../helpers/fetchItemsAndTags'
 import updateUser from '../helpers/UpdateUser'
@@ -23,6 +24,7 @@ const ItemPage = () => {
   const dispatch = useDispatch()
   const user = useSelector(state => state.login.currentUser)
   const darkMode = useSelector(state => state.mode.darkMode)
+  const isMobile = useMediaQuery({ query: '(max-width: 425px)' })
 
   const [item, setItem] = useState({})
   const [collection, setCollection] = useState({})
@@ -83,20 +85,20 @@ const ItemPage = () => {
   return (
     <div className={`d-flex flex-column align-items-center min-vh-100 ${darkMode ? 'text-bg-dark' : 'bg-light'}`}>
       <div className='d-flex flex-column w-75'>
-        <div className="text-center my-4 position-relative">
-          <div className="position-absolute" style={{top: '0px', left: '0px'}}>
-            <button className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'}`} onClick={() => navigate(-1)}>
+        <h3 className="w-100 text-center mt-4" style={{right: '50%'}}>{t('item')} "{item.name}"</h3>
+        <div className="text-center mb-3 d-flex justify-content-between">
+          <div className="">
+            <button className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'}`} onClick={() => navigate(`/collection-page/${item.collection_id}`)}>
               <img src={darkMode ? BackDark : Back} width={25} height={25}/> {t('buttons.back')}
             </button>
           </div>
-          <h3 className="w-100 text-center" style={{right: '50%'}}>{t('item')} "{item.name}"</h3>
           {(user.id === item.user_id || user.admin == 1) &&
-          <div className="position-absolute" style={{top: '0px', right: '0px'}}>
+          <div className="" >
             <NavLink to='edit-item' className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'} me-2`}>
-              <img src={darkMode ? EditDark : Edit} width={25} height={25}/> {t('buttons.edit')}
+              <img src={darkMode ? EditDark : Edit} width={25} height={25}/> {!isMobile && t('buttons.edit')}
             </NavLink>
             <button className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'}`} onClick={handleDelete}>
-              <img src={darkMode ? TrashDark : Trash} width={25} height={25}/> {t('buttons.delete')}
+              <img src={darkMode ? TrashDark : Trash} width={25} height={25}/> {!isMobile && t('buttons.delete')}
             </button>
           </div>}
         </div>

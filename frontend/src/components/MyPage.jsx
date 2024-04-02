@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { NavLink, useNavigate, useParams } from 'react-router-dom'
 import {useDispatch, useSelector} from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useMediaQuery } from 'react-responsive'
 import axios from 'axios'
 import updateUser from '../helpers/UpdateUser'
 import { setUser } from "../features/loginSlice"
@@ -16,6 +17,7 @@ const MyPage = () => {
   const { user_id } = useParams()
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const isMobile = useMediaQuery({ query: '(max-width: 425px)' })
   const [t, i18n] = useTranslation()
   const [author, setAuthor] = useState('')
   const [data, setData] = useState([])
@@ -96,15 +98,16 @@ const MyPage = () => {
         <div className='d-flex justify-content-between my-4'>
         <h3>{t('collectionsOf')} "{author.name}" {user.id == user_id && `(${t('you')})`}</h3>
           {(user.id == user_id || user.admin == 1) &&
-            <div>
+            <div className='d-flex flex-row align-items-center'>
             <NavLink to='new-collection' className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'} me-2`}>
-            <img src={darkMode ? NewDark : New} width={25} height={25}/> {t('buttons.new')}
+            <img src={darkMode ? NewDark : New} width={25} height={25}/> {!isMobile && t('buttons.new')}
             </NavLink>
             <button className={`btn ${darkMode ? 'btn-dark border' : 'btn-outline-dark'}`} onClick={handleDelete}>
-            <img src={darkMode? TrashDark : Trash} width={25} height={25}/> {t('buttons.delete')}
+            <img src={darkMode? TrashDark : Trash} width={25} height={25}/> {!isMobile && t('buttons.delete')}
             </button>
           </div>}
         </div>
+        <div className='w-100 overflow-scroll'>
         <table className='table table-hover'>
           <thead>
             <tr>
@@ -140,6 +143,7 @@ const MyPage = () => {
             })}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   )

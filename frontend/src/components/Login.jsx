@@ -39,6 +39,7 @@ const Form = ({heading}) => {
                     dispatch(setUser({...res.data}))
                     document.getElementById('signupModal').classList.remove('show')
                     document.getElementsByClassName('modal-backdrop')[0].remove()
+                    document.querySelector('body').style.overflow = 'scroll'
                     setMessage(prev => ({...prev, text:""}))
                 }
             })
@@ -55,6 +56,7 @@ const Form = ({heading}) => {
                     dispatch(setUser({...res.data}))
                     document.getElementById('loginModal').classList.remove('show')
                     document.getElementsByClassName('modal-backdrop')[0].remove()
+                    document.querySelector('body').style.overflow = 'scroll'
                     setMessage(prev => ({...prev, text:""}))
                 }               
                 
@@ -73,7 +75,7 @@ const Form = ({heading}) => {
         }
     }
   return (
-    <div className="modal fade" id={heading === t('login') ? 'loginModal' : 'signupModal'} tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div className="modal fade  " id={heading === t('login') ? 'loginModal' : 'signupModal'} tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div className="modal-dialog modal-dialog-centered">
           <div className="modal-content">
             <div className="modal-header">
